@@ -1,0 +1,67 @@
+import type { Metadata } from "next";
+import { Poppins, Inter } from "next/font/google";
+import "./globals.css";
+import NavbarWrapper from "@/components/NavbarWrapper";
+import FooterWrapper from "@/components/FooterWrapper";
+import ThemeProvider from "@/components/ThemeProvider";
+import ThemeInitializer from "@/components/ThemeInitializer";
+import SplashScreen from "@/components/SplashScreen";
+import ServiceWorker from "@/components/ServiceWorker";
+
+const poppins = Poppins({
+  variable: "--font-poppins",
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700", "800"],
+});
+
+const inter = Inter({
+  variable: "--font-inter",
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+});
+
+export const metadata: Metadata = {
+  title: "SMP Muhammadiyah 1 Genteng - Sekolah Unggul Berkemajuan",
+  description: "Website resmi SMP Muhammadiyah 1 Genteng Banyuwangi - SPMB Online, Program Unggulan, Akreditasi A, Fasilitas Lengkap",
+  keywords: "SMP, Muhammadiyah, Genteng, Banyuwangi, SPMB, SPMB, Sekolah Islam",
+  manifest: "/manifest.webmanifest",
+  appleWebApp: {
+    capable: true,
+    title: "SMP Mutiara",
+    statusBarStyle: "black-translucent",
+  },
+  other: {
+    "mobile-web-app-capable": "yes",
+  },
+};
+
+export default function RootLayout({
+  children,
+}: Readonly<{
+  children: React.ReactNode;
+}>) {
+  return (
+    <html lang="id" className={`${poppins.variable} ${inter.variable}`}>
+      <head>
+        <meta name="theme-color" content="#1B5E20" media="(prefers-color-scheme: light)" />
+        <meta name="theme-color" content="#0F172A" media="(prefers-color-scheme: dark)" />
+        <meta name="application-name" content="SMP Mutiara" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+        <meta name="apple-mobile-web-app-title" content="SMP Mutiara" />
+        <meta name="format-detection" content="telephone=no" />
+        <link rel="apple-touch-startup-image" href="/icons/icon-512.png" />
+      </head>
+      <body className="font-sans min-h-screen flex flex-col">
+        <ThemeProvider>
+          <ThemeInitializer />
+          <SplashScreen />
+          <ServiceWorker />
+          <NavbarWrapper />
+          <main className="flex-grow md:pt-16 page-enter">{children}</main>
+          <FooterWrapper />
+        </ThemeProvider>
+      </body>
+    </html>
+  );
+}
