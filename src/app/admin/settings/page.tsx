@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { adminApi } from "@/lib/adminApi";
-import { Save, Check } from "lucide-react";
+import { Save, Check, Lock, AlertCircle, Loader2 } from "lucide-react";
 
 const defaultSettings: Record<string, string> = {
   schoolName: "SMP Muhammadiyah 1 Genteng",
@@ -308,6 +308,11 @@ export default function AdminSettings() {
           </div>
         </div>
 
+        <div style={sectionStyle}>
+          <h2 className="text-lg font-semibold mb-4" style={{ color: "var(--text-primary)" }}>Ubah Password Admin</h2>
+          <PasswordChangeForm />
+        </div>
+
         <div className="flex items-center justify-end gap-4">
           {saved && (
             <span className="flex items-center gap-1 text-sm font-medium" style={{ color: "var(--success)" }}>
@@ -322,6 +327,77 @@ export default function AdminSettings() {
         </div>
       </form>
     </div>
+  );
+}
+
+function PasswordChangeForm() {
+  const [currentPassword, setCurrentPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState(false);
+  const [loading, setLoading] = useState(false);
+
+  const handleChange = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError("");
+    setSuccess(false);
+    if (newPassword.length < 6) { setError("Password baru minimal 6 karakter"); return; }
+    if (newPassword !== confirmPassword) { setError("Konfirmasi password tidak cocok"); return; }
+    setLoading(true);
+    try {
+      const res = await fetch("/api/auth", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "change-password", password: currentPassword, newPassword }),
+      });
+      const data = await res.json();
+      if (!res.ok) { setError(data.error || "Gagal mengubah password"); }
+      else {
+        setSuccess(true);
+        setCurrentPassword("");
+        setNewPassword("");
+        setConfirmPassword("");
+      }
+    } catch { setError("Terjadi kesalahan"); }
+    finally { setLoading(false); }
+  };
+
+  const inputClass = "w-full px-3 py-2 border rounded-lg text-sm outline-none transition-all focus:ring-2";
+
+  return (
+    <form onSubmit={handleChange} className="space-y-4 max-w-md">
+      {error && (
+        <div className="flex items-center gap-2 text-sm p-3 rounded-lg" style={{ background: "color-mix(in srgb, var(--error) 10%, transparent)", color: "var(--error)" }}>
+          <AlertCircle className="w-4 h-4 flex-shrink-0" />{error}
+        </div>
+      )}
+      {success && (
+        <div className="flex items-center gap-2 text-sm p-3 rounded-lg" style={{ background: "color-mix(in srgb, var(--success) 10%, transparent)", color: "var(--success)" }}>
+          <Check className="w-4 h-4 flex-shrink-0" /> Password berhasil diubah
+        </div>
+      )}
+      <div>
+        <label className="block text-sm font-medium mb-1" style={{ color: "var(--text-secondary)" }}>Password Saat Ini</label>
+        <input type="password" value={currentPassword} onChange={(e) => setCurrentPassword(e.target.value)} required
+          className={inputClass} style={{ borderColor: "var(--card-border)", background: "var(--background)", color: "var(--text-primary)" }} />
+      </div>
+      <div>
+        <label className="block text-sm font-medium mb-1" style={{ color: "var(--text-secondary)" }}>Password Baru</label>
+        <input type="password" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} required
+          className={inputClass} style={{ borderColor: "var(--card-border)", background: "var(--background)", color: "var(--text-primary)" }} />
+      </div>
+      <div>
+        <label className="block text-sm font-medium mb-1" style={{ color: "var(--text-secondary)" }}>Konfirmasi Password Baru</label>
+        <input type="password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} required
+          className={inputClass} style={{ borderColor: "var(--card-border)", background: "var(--background)", color: "var(--text-primary)" }} />
+      </div>
+      <button type="submit" disabled={loading}
+        className="flex items-center gap-2 text-white font-semibold px-5 py-2.5 rounded-lg text-sm transition-all disabled:opacity-50"
+        style={{ background: "var(--primary)" }}>
+        {loading ? <><Loader2 className="w-4 h-4 animate-spin" /> Menyimpan...</> : <><Lock className="w-4 h-4" /> Ubah Password</>}
+      </button>
+    </form>
   );
 }
 

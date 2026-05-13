@@ -27,14 +27,27 @@ export default function AdminLogin() {
     );
   }
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (username === "admin" && password === "admin123") {
-      setLoading(true);
-      localStorage.setItem("admin_logged_in", "true");
-      window.location.href = "/admin";
-    } else {
-      setError("Username atau password salah");
+    setLoading(true);
+    setError("");
+    try {
+      const res = await fetch("/api/auth", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "login", username, password }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        setError(data.error || "Username atau password salah");
+      } else {
+        localStorage.setItem("admin_logged_in", "true");
+        window.location.href = "/admin";
+      }
+    } catch {
+      setError("Terjadi kesalahan. Silakan coba lagi.");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -104,7 +117,7 @@ export default function AdminLogin() {
 
           <div className="mt-6 pt-6" style={{ borderTop: "1px solid var(--card-border)" }}>
             <p className="text-xs text-center" style={{ color: "var(--text-muted)" }}>
-              Demo: admin / admin123
+              Default: admin / admin123
             </p>
           </div>
         </div>
