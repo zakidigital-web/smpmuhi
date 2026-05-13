@@ -14,6 +14,15 @@ export type SiteSettings = {
   sppmYear: string;
   gmapsLat: string;
   gmapsLng: string;
+  showFees: string;
+  feeRegistration: string;
+  feeDevelopment: string;
+  feeUniform: string;
+  feeSpp: string;
+  feeBooks: string;
+  feeActivities: string;
+  showFacilities: string;
+  facilities: string;
 };
 
 export const siteSettings: SiteSettings = {
@@ -32,4 +41,13 @@ export const siteSettings: SiteSettings = {
   sppmYear: "2026",
   gmapsLat: "-8.360388",
   gmapsLng: "114.159599",
+  showFees: "1",
+  feeRegistration: "Gratis",
+  feeDevelopment: "Rp 500.000",
+  feeUniform: "Rp 350.000",
+  feeSpp: "Rp 150.000",
+  feeBooks: "Rp 75.000",
+  feeActivities: "Rp 50.000",
+  showFacilities: "1",
+  facilities: "Ruang Kelas Nyaman, Lab Komputer, Perpustakaan, Musholla, Lapangan Olahraga, Kantin Sehat, Ruang UKS, WiFi Internet, Pondok Pesantren",
 };

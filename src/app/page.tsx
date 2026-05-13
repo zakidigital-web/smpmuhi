@@ -2,6 +2,7 @@ import Link from "next/link";
 import { Users, Award, GraduationCap, BookOpen, ArrowRight, Calendar, Clock, CheckCircle, Star, Newspaper, Camera } from "lucide-react";
 import HeroSlider from "@/components/HeroSlider";
 import UpcomingAgenda from "@/components/UpcomingAgenda";
+import FasilitasSection from "@/components/FasilitasSection";
 import { heroSlides } from "@/data/hero";
 import { beritaList } from "@/data/berita";
 import { galeriList } from "@/data/galeri";
@@ -244,38 +245,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Fasilitas */}
-      <section className="py-16 md:py-24 bg-section">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-10">
-            <h2 className="text-3xl md:text-4xl font-bold mb-3" style={{ color: "var(--text-primary)" }}>
-              Fasilitas Sekolah
-            </h2>
-            <p className="max-w-2xl mx-auto" style={{ color: "var(--text-muted)" }}>
-              Sarana dan prasarana lengkap untuk menunjang kegiatan belajar mengajar
-            </p>
-          </div>
-
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-2 md:gap-3">
-            {[
-              "Ruang Kelas Nyaman",
-              "Lab Komputer",
-              "Perpustakaan",
-              "Musholla",
-              "Lapangan Olahraga",
-              "Kantin Sehat",
-              "Ruang UKS",
-              "WiFi Internet",
-              "Pondok Pesantren",
-            ].map((fasilitas, index) => (
-              <div key={index} className="flex items-center gap-2.5 p-3.5 rounded-xl" style={{ background: "var(--section-alt)" }}>
-                <CheckCircle className="w-5 h-5 flex-shrink-0" style={{ color: "var(--success)" }} />
-                <span className="text-sm font-medium" style={{ color: "var(--text-secondary)" }}>{fasilitas}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
+      <FasilitasSection />
 
       {/* CTA */}
       <section className="py-16 md:py-24" style={{ background: "var(--secondary)" }}>

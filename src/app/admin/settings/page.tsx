@@ -22,6 +22,15 @@ const defaultSettings: Record<string, string> = {
   copyright: "All rights reserved.",
   gmapsLat: "-8.360388",
   gmapsLng: "114.159599",
+  showFees: "1",
+  feeRegistration: "Gratis",
+  feeDevelopment: "Rp 500.000",
+  feeUniform: "Rp 350.000",
+  feeSpp: "Rp 150.000",
+  feeBooks: "Rp 75.000",
+  feeActivities: "Rp 50.000",
+  showFacilities: "1",
+  facilities: "Ruang Kelas Nyaman, Lab Komputer, Perpustakaan, Musholla, Lapangan Olahraga, Kantin Sehat, Ruang UKS, WiFi Internet, Pondok Pesantren",
 };
 
 export default function AdminSettings() {
@@ -189,6 +198,78 @@ export default function AdminSettings() {
                 className={inputClass} style={{ borderColor: "var(--card-border)", background: "var(--background)", color: "var(--text-primary)" }} />
             </div>
           </div>
+        </div>
+
+        <div style={sectionStyle}>
+          <h2 className="text-lg font-semibold mb-4" style={{ color: "var(--text-primary)" }}>Biaya Pendidikan</h2>
+          <p className="text-xs mb-3" style={{ color: "var(--text-muted)" }}>Biaya yang ditampilkan di halaman SPMB.</p>
+          <div className="flex items-center gap-3 mb-4">
+            <label className="relative inline-flex items-center cursor-pointer">
+              <input type="checkbox" checked={form.showFees === "1"} onChange={(e) => update("showFees", e.target.checked ? "1" : "0")} className="sr-only peer" />
+              <div className="w-10 h-5 rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-0.5 after:start-[3px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all" style={{ background: form.showFees === "1" ? "var(--primary)" : "var(--card-border)" }} />
+              <span className="ms-3 text-sm font-medium" style={{ color: "var(--text-secondary)" }}>{form.showFees === "1" ? "Ditampilkan" : "Disembunyikan"}</span>
+            </label>
+          </div>
+          <div className="grid md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium" style={labelStyle}>Pendaftaran</label>
+              <input value={form.feeRegistration} onChange={(e) => update("feeRegistration", e.target.value)}
+                className={inputClass} style={{ borderColor: "var(--card-border)", background: "var(--background)", color: "var(--text-primary)" }} />
+            </div>
+            <div>
+              <label className="block text-sm font-medium" style={labelStyle}>Dana Pengembangan</label>
+              <input value={form.feeDevelopment} onChange={(e) => update("feeDevelopment", e.target.value)}
+                className={inputClass} style={{ borderColor: "var(--card-border)", background: "var(--background)", color: "var(--text-primary)" }} />
+            </div>
+            <div>
+              <label className="block text-sm font-medium" style={labelStyle}>Seragam & Perlengkapan</label>
+              <input value={form.feeUniform} onChange={(e) => update("feeUniform", e.target.value)}
+                className={inputClass} style={{ borderColor: "var(--card-border)", background: "var(--background)", color: "var(--text-primary)" }} />
+            </div>
+            <div>
+              <label className="block text-sm font-medium" style={labelStyle}>SPP (Bulanan)</label>
+              <input value={form.feeSpp} onChange={(e) => update("feeSpp", e.target.value)}
+                className={inputClass} style={{ borderColor: "var(--card-border)", background: "var(--background)", color: "var(--text-primary)" }} />
+            </div>
+            <div>
+              <label className="block text-sm font-medium" style={labelStyle}>Buku & LKS (Bulanan)</label>
+              <input value={form.feeBooks} onChange={(e) => update("feeBooks", e.target.value)}
+                className={inputClass} style={{ borderColor: "var(--card-border)", background: "var(--background)", color: "var(--text-primary)" }} />
+            </div>
+            <div>
+              <label className="block text-sm font-medium" style={labelStyle}>Kegiatan (Bulanan)</label>
+              <input value={form.feeActivities} onChange={(e) => update("feeActivities", e.target.value)}
+                className={inputClass} style={{ borderColor: "var(--card-border)", background: "var(--background)", color: "var(--text-primary)" }} />
+            </div>
+          </div>
+        </div>
+
+        <div style={sectionStyle}>
+          <h2 className="text-lg font-semibold mb-4" style={{ color: "var(--text-primary)" }}>Fasilitas Sekolah</h2>
+          <p className="text-xs mb-3" style={{ color: "var(--text-muted)" }}>Fasilitas yang ditampilkan di halaman Beranda.</p>
+          <div className="flex items-center gap-3 mb-4">
+            <label className="relative inline-flex items-center cursor-pointer">
+              <input type="checkbox" checked={form.showFacilities === "1"} onChange={(e) => update("showFacilities", e.target.checked ? "1" : "0")} className="sr-only peer" />
+              <div className="w-10 h-5 rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-0.5 after:start-[3px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all" style={{ background: form.showFacilities === "1" ? "var(--primary)" : "var(--card-border)" }} />
+              <span className="ms-3 text-sm font-medium" style={{ color: "var(--text-secondary)" }}>{form.showFacilities === "1" ? "Ditampilkan" : "Disembunyikan"}</span>
+            </label>
+          </div>
+          <div>
+            <label className="block text-sm font-medium" style={labelStyle}>Daftar Fasilitas</label>
+            <p className="text-xs mb-1" style={{ color: "var(--text-muted)" }}>Pisahkan dengan koma (contoh: Ruang Kelas, Lab, Perpustakaan)</p>
+            <textarea value={form.facilities} onChange={(e) => update("facilities", e.target.value)}
+              className={inputClass} style={{ borderColor: "var(--card-border)", background: "var(--background)", color: "var(--text-primary)" }} rows={4} />
+          </div>
+          {form.showFacilities === "1" && form.facilities && (
+            <div className="mt-3">
+              <p className="text-xs font-medium mb-2" style={{ color: "var(--text-muted)" }}>Pratinjau:</p>
+              <div className="flex flex-wrap gap-2">
+                {form.facilities.split(",").map((f, i) => f.trim() && (
+                  <span key={i} className="text-xs px-2.5 py-1 rounded-full" style={{ background: "color-mix(in srgb, var(--success) 12%, transparent)", color: "var(--success)" }}>{f.trim()}</span>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
 
         <div style={sectionStyle}>
