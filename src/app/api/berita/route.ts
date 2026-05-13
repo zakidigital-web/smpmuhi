@@ -8,7 +8,7 @@ export async function GET() {
 
 export async function PUT(request: Request) {
   const body = await request.json();
-  const { id, title, excerpt, content, date, author, category, slug } = body;
+  const { id, title, excerpt, content, date, author, category, slug, image, allow_comments } = body;
 
   if (!id || !title) {
     return NextResponse.json({ error: "ID and title required" }, { status: 400 });
@@ -18,13 +18,13 @@ export async function PUT(request: Request) {
 
   if (existing) {
     execute(
-      `UPDATE berita SET title=@title, excerpt=@excerpt, content=@content, date=@date, author=@author, category=@category, slug=@slug WHERE id=@id`,
-      { id, title, excerpt, content, date, author, category, slug }
+      `UPDATE berita SET title=@title, excerpt=@excerpt, content=@content, date=@date, author=@author, category=@category, slug=@slug, image=@image, allow_comments=@allow_comments WHERE id=@id`,
+      { id, title, excerpt, content, date, author, category, slug, image: image || "", allow_comments: allow_comments ?? 1 }
     );
   } else {
     execute(
-      `INSERT INTO berita (id, title, excerpt, content, date, author, category, slug) VALUES (@id, @title, @excerpt, @content, @date, @author, @category, @slug)`,
-      { id, title, excerpt, content, date, author, category, slug }
+      `INSERT INTO berita (id, title, excerpt, content, date, author, category, slug, image, allow_comments) VALUES (@id, @title, @excerpt, @content, @date, @author, @category, @slug, @image, @allow_comments)`,
+      { id, title, excerpt, content, date, author, category, slug, image: image || "", allow_comments: allow_comments ?? 1 }
     );
   }
 

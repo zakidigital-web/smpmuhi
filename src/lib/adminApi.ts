@@ -49,4 +49,10 @@ export const adminApi = {
     save: (settings: Record<string, string>) =>
       request(`${BASE}/settings`, { method: "PUT", body: JSON.stringify({ settings }) }),
   },
+  komentar: {
+    list: (berita_id: string) =>
+      request<Record<string, unknown>[]>(`${BASE}/komentar?berita_id=${berita_id}`),
+    remove: (id: string) =>
+      request(`${BASE}/komentar`, { method: "DELETE", body: JSON.stringify({ id }) }),
+  },
 };

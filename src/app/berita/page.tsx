@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Calendar, User, Tag, X, Share2, Check, ArrowLeft, Loader2 } from "lucide-react";
+import { Calendar, User, Tag, X, Share2, Check, ArrowLeft, Loader2, Send, MessageSquare } from "lucide-react";
 
 type BeritaItem = {
   id: string;
@@ -15,11 +15,26 @@ type BeritaItem = {
   image: string;
 };
 
+type CommentItem = {
+  id: string;
+  berita_id: string;
+  name: string;
+  content: string;
+  created_at: string;
+};
+
 export default function BeritaPage() {
   const [items, setItems] = useState<BeritaItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
+  const [comments, setComments] = useState<CommentItem[]>([]);
+  const [commentsLoading, setCommentsLoading] = useState(false);
+  const [commentName, setCommentName] = useState("");
+  const [commentContent, setCommentContent] = useState("");
+  const [commentSubmitting, setCommentSubmitting] = useState(false);
+  const [commentError, setCommentError] = useState("");
+  const [commentSuccess, setCommentSuccess] = useState(false);
 
   useEffect(() => {
     fetch("/api/berita")
@@ -39,6 +54,43 @@ export default function BeritaPage() {
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     }
+  };
+
+  useEffect(() => {
+    if (selectedId) {
+      setCommentsLoading(true);
+      setCommentSuccess(false);
+      setCommentError("");
+      fetch(`/api/komentar?berita_id=${selectedId}`)
+        .then((r) => r.json())
+        .then((data) => { setComments(data); setCommentsLoading(false); })
+        .catch(() => setCommentsLoading(false));
+    }
+  }, [selectedId]);
+
+  const handleCommentSubmit = async () => {
+    if (!commentContent.trim()) return;
+    setCommentSubmitting(true);
+    setCommentError("");
+    try {
+      const res = await fetch("/api/komentar", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ berita_id: selectedId, name: commentName.trim() || "Anonim", content: commentContent.trim() }),
+      });
+      const json = await res.json();
+      if (!res.ok) {
+        setCommentError(json.error || "Gagal mengirim komentar");
+      } else {
+        setCommentSuccess(true);
+        setCommentContent("");
+        const updated = await fetch(`/api/komentar?berita_id=${selectedId}`).then((r) => r.json());
+        setComments(updated);
+      }
+    } catch {
+      setCommentError("Gagal mengirim komentar");
+    }
+    setCommentSubmitting(false);
   };
 
   return (
@@ -180,6 +232,54 @@ export default function BeritaPage() {
                   style={{ background: "var(--primary)" }}>
                   {copied ? <><Check className="w-4 h-4" /> Tersalin</> : <><Share2 className="w-4 h-4" /> Bagikan</>}
                 </button>
+              </div>
+
+              <div className="mt-8 pt-6" style={{ borderTop: "1px solid var(--card-border)" }}>
+                <h3 className="text-lg font-bold mb-4 flex items-center gap-2" style={{ color: "var(--text-primary)" }}>
+                  <MessageSquare className="w-5 h-5" /> Komentar ({comments.length})
+                </h3>
+
+                <form onSubmit={(e) => { e.preventDefault(); handleCommentSubmit(); }} className="mb-6 space-y-3">
+                  <input type="text" value={commentName} onChange={(e) => setCommentName(e.target.value)}
+                    placeholder="Nama (opsional)"
+                    className="w-full px-3 py-2 border rounded-lg text-sm outline-none"
+                    style={{ borderColor: "var(--card-border)", background: "var(--background)", color: "var(--text-primary)" }} />
+                  <textarea value={commentContent} onChange={(e) => setCommentContent(e.target.value)}
+                    placeholder="Tulis komentar..." rows={3} required
+                    className="w-full px-3 py-2 border rounded-lg text-sm outline-none resize-none"
+                    style={{ borderColor: "var(--card-border)", background: "var(--background)", color: "var(--text-primary)" }} />
+                  {commentError && <p className="text-xs" style={{ color: "var(--error)" }}>{commentError}</p>}
+                  {commentSuccess && <p className="text-xs" style={{ color: "var(--success)" }}>Komentar berhasil dikirim!</p>}
+                  <button type="submit" disabled={commentSubmitting || !commentContent.trim()}
+                    className="flex items-center gap-2 text-white font-semibold px-5 py-2.5 rounded-lg text-sm transition-colors disabled:opacity-50"
+                    style={{ background: "var(--primary)" }}>
+                    {commentSubmitting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
+                    Kirim Komentar
+                  </button>
+                </form>
+
+                {commentsLoading ? (
+                  <div className="flex items-center justify-center py-6">
+                    <Loader2 className="w-5 h-5 animate-spin" style={{ color: "var(--primary)" }} />
+                  </div>
+                ) : comments.length === 0 ? (
+                  <p className="text-sm py-6 text-center" style={{ color: "var(--text-muted)" }}>Belum ada komentar. Jadilah yang pertama!</p>
+                ) : (
+                  <div className="space-y-4">
+                    {comments.map((c) => (
+                      <div key={c.id} className="p-4 rounded-xl" style={{ background: "var(--section-alt)" }}>
+                        <div className="flex items-center gap-2 mb-1">
+                          <User className="w-3.5 h-3.5" style={{ color: "var(--primary)" }} />
+                          <span className="font-semibold text-sm" style={{ color: "var(--text-primary)" }}>{c.name}</span>
+                        </div>
+                        <p className="text-sm leading-relaxed mb-1" style={{ color: "var(--text-secondary)" }}>{c.content}</p>
+                        <span className="text-xs" style={{ color: "var(--text-muted)" }}>
+                          {new Date(c.created_at).toLocaleDateString("id-ID", { day: "numeric", month: "long", year: "numeric", hour: "2-digit", minute: "2-digit" })}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
             </div>
           </div>

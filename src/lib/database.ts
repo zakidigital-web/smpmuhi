@@ -97,6 +97,18 @@ function initTables() {
   try { db.exec("ALTER TABLE galeri ADD COLUMN url TEXT NOT NULL DEFAULT ''"); } catch {}
   try { db.exec("ALTER TABLE berita ADD COLUMN image TEXT NOT NULL DEFAULT ''"); } catch {}
   try { db.exec("ALTER TABLE hero ADD COLUMN image TEXT NOT NULL DEFAULT ''"); } catch {}
+  try { db.exec("ALTER TABLE berita ADD COLUMN allow_comments INTEGER NOT NULL DEFAULT 1"); } catch {}
+
+  db.exec(`
+    CREATE TABLE IF NOT EXISTS comments (
+      id TEXT PRIMARY KEY,
+      berita_id TEXT NOT NULL,
+      name TEXT NOT NULL DEFAULT 'Anonim',
+      content TEXT NOT NULL,
+      created_at TEXT NOT NULL,
+      FOREIGN KEY (berita_id) REFERENCES berita(id)
+    )
+  `);
 
   const count = db.prepare("SELECT COUNT(*) as c FROM hero").get() as { c: number };
   if (count.c === 0) seedData();

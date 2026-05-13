@@ -3,13 +3,14 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { LayoutDashboard, Newspaper, Image, SlidersHorizontal, Settings, LogOut, Menu, X, ChevronRight, GraduationCap, Database, HardDrive, Activity, CalendarDays, UserCheck, Sun, Moon } from "lucide-react";
+import { LayoutDashboard, Newspaper, Image, SlidersHorizontal, Settings, LogOut, Menu, X, ChevronRight, GraduationCap, Database, HardDrive, Activity, CalendarDays, UserCheck, Sun, Moon, MessageSquare } from "lucide-react";
 import { useTheme } from "@/components/ThemeProvider";
 
 const sidebarItems = [
   { href: "/admin", label: "Dashboard", icon: LayoutDashboard },
   { href: "/admin/hero", label: "Hero Slider", icon: SlidersHorizontal },
   { href: "/admin/berita", label: "Berita", icon: Newspaper },
+  { href: "/admin/komentar", label: "Komentar", icon: MessageSquare },
   { href: "/admin/agenda", label: "Agenda", icon: CalendarDays },
   { href: "/admin/galeri", label: "Galeri", icon: Image },
   { href: "/admin/spmb", label: "SPMB", icon: UserCheck },

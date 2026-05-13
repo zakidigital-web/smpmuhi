@@ -2,9 +2,9 @@
 
 import { useState, useEffect } from "react";
 import { adminApi } from "@/lib/adminApi";
-import { Plus, Pencil, Trash2, Search, X, Check, Image as ImageIcon, Upload, Loader2 } from "lucide-react";
+import { Plus, Pencil, Trash2, Search, X, Check, Image as ImageIcon, Upload, Loader2, MessageSquare, MessageSquareOff } from "lucide-react";
 
-const emptyBerita = { id: "", title: "", excerpt: "", content: "", date: "", author: "Admin", category: "", slug: "", image: "" };
+const emptyBerita = { id: "", title: "", excerpt: "", content: "", date: "", author: "Admin", category: "", slug: "", image: "", allow_comments: 1 };
 const categories = ["Pendaftaran", "Prestasi", "Kegiatan", "Akademik", "Keagamaan"];
 
 export default function AdminBerita() {
@@ -164,6 +164,14 @@ export default function AdminBerita() {
                     <ImageIcon className="w-4 h-4" /> Belum ada gambar
                   </div>
                 )}
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-1" style={{ color: "var(--text-secondary)" }}>Komentar</label>
+                <button onClick={() => setForm({ ...form, allow_comments: form.allow_comments ? 0 : 1 })}
+                  className="flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium transition-colors"
+                  style={{ background: form.allow_comments ? "color-mix(in srgb, var(--success) 12%, transparent)" : "color-mix(in srgb, var(--error) 12%, transparent)", color: form.allow_comments ? "var(--success)" : "var(--error)", border: "1px solid var(--card-border)" }}>
+                  {form.allow_comments ? <><MessageSquare className="w-4 h-4" /> Komentar Diaktifkan</> : <><MessageSquareOff className="w-4 h-4" /> Komentar Dinonaktifkan</>}
+                </button>
               </div>
             </div>
             <div className="flex justify-end gap-3 mt-6 pt-4" style={{ borderTop: "1px solid var(--card-border)" }}>
