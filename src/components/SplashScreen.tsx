@@ -8,6 +8,7 @@ export default function SplashScreen() {
   const [remove, setRemove] = useState(false);
   const [schoolName, setSchoolName] = useState("SMP Muhammadiyah 1");
   const [schoolSub, setSchoolSub] = useState("Genteng &mdash; Banyuwangi");
+  const [logo, setLogo] = useState("");
 
   useEffect(() => {
     fetch("/api/settings")
@@ -21,6 +22,7 @@ export default function SplashScreen() {
           setSchoolName(data.schoolName);
           setSchoolSub("");
         }
+        if (data?.logo) setLogo(data.logo);
       })
       .catch(() => {});
   }, []);
@@ -44,7 +46,11 @@ export default function SplashScreen() {
   return (
     <div className={`splash-screen${hide ? " hide" : ""}`}>
       <div className="splash-icon">
-        <GraduationCap className="w-10 h-10" style={{ color: "var(--primary)" }} />
+        {logo ? (
+          <img src={logo} alt="Logo" className="w-12 h-12 object-contain" />
+        ) : (
+          <GraduationCap className="w-10 h-10" style={{ color: "var(--primary)" }} />
+        )}
       </div>
       <div className="splash-title">{schoolName}</div>
       {schoolSub && <div className="splash-sub" dangerouslySetInnerHTML={{ __html: schoolSub }} />}

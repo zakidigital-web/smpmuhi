@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import { adminApi } from "@/lib/adminApi";
-import { Save, Check, Lock, AlertCircle, Loader2, School, Phone, Globe, MapPin, Image, PiggyBank, Palette, KeyRound, Menu, X } from "lucide-react";
+import { Save, Check, Lock, AlertCircle, Loader2, School, Phone, Globe, MapPin, Image, PiggyBank, Palette, KeyRound, Menu, X, Upload, Trash2 } from "lucide-react";
 
 const defaultSettings: Record<string, string> = {
   schoolName: "SMP Muhammadiyah 1 Genteng",
@@ -32,6 +32,8 @@ const defaultSettings: Record<string, string> = {
   showFacilities: "1",
   facilities: "Ruang Kelas Nyaman, Lab Komputer, Perpustakaan, Musholla, Lapangan Olahraga, Kantin Sehat, Ruang UKS, WiFi Internet, Pondok Pesantren",
   kepalaSekolah: "Abdul Latif, S.Pd.",
+  fotoKepalaSekolah: "",
+  logo: "",
 };
 
 const sections = [
@@ -51,6 +53,7 @@ export default function AdminSettings() {
   const [saved, setSaved] = useState(false);
   const [activeSection, setActiveSection] = useState("sekolah");
   const [navOpen, setNavOpen] = useState(false);
+  const [uploading, setUploading] = useState<string | null>(null);
   const observerRef = useRef<IntersectionObserver | null>(null);
 
   useEffect(() => {
@@ -83,6 +86,30 @@ export default function AdminSettings() {
   const scrollTo = (id: string) => {
     setNavOpen(false);
     document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
+  };
+
+  const handleUpload = async (key: string, file: File | undefined) => {
+    if (!file) return;
+    setUploading(key);
+    try {
+      const reader = new FileReader();
+      const base64 = await new Promise<string>((resolve, reject) => {
+        reader.onload = () => resolve(reader.result as string);
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+      });
+      const res = await fetch("/api/upload", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ data: base64 }),
+      });
+      const json = await res.json();
+      if (json.url) {
+        update(key, json.url);
+      }
+    } finally {
+      setUploading(null);
+    }
   };
 
   const update = (key: string, value: string) => {
@@ -204,6 +231,60 @@ export default function AdminSettings() {
                 <label className="block text-sm font-medium" style={labelStyle}>Alamat</label>
                 <textarea value={form.address} onChange={(e) => update("address", e.target.value)}
                   className={inputClass} style={{ borderColor: "var(--card-border)", background: "var(--background)", color: "var(--text-primary)" }} rows={2} />
+              </div>
+              <div className="md:col-span-2 border-t pt-4" style={{ borderColor: "var(--card-border)" }}>
+                <h3 className="text-sm font-semibold mb-3" style={{ color: "var(--text-primary)" }}>Foto Kepala Sekolah</h3>
+                <div className="flex items-start gap-4">
+                  {form.fotoKepalaSekolah ? (
+                    <div className="relative group">
+                      <img src={form.fotoKepalaSekolah} alt="Kepala Sekolah" className="w-28 h-36 object-cover rounded-lg" />
+                      <button type="button" onClick={() => update("fotoKepalaSekolah", "")}
+                        className="absolute -top-2 -right-2 p-1.5 rounded-full bg-red-500 text-white opacity-0 group-hover:opacity-100 transition-opacity">
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="w-28 h-36 rounded-lg flex items-center justify-center" style={{ background: "color-mix(in srgb, var(--primary) 8%, var(--card))", border: "2px dashed var(--card-border)" }}>
+                      <Image className="w-8 h-8" style={{ color: "var(--text-muted)" }} />
+                    </div>
+                  )}
+                  <div className="flex-1">
+                    <label className="relative cursor-pointer">
+                      <input type="file" accept="image/*" className="sr-only" onChange={(e) => handleUpload("fotoKepalaSekolah", e.target.files?.[0])} />
+                      <span className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all" style={{ background: "color-mix(in srgb, var(--primary) 10%, transparent)", color: "var(--primary)", border: "1px solid color-mix(in srgb, var(--primary) 30%, transparent)" }}>
+                        {uploading === "fotoKepalaSekolah" ? <><Loader2 className="w-4 h-4 animate-spin" /> Mengunggah...</> : <><Upload className="w-4 h-4" /> Pilih Gambar</>}
+                      </span>
+                    </label>
+                    <p className="text-xs mt-1" style={{ color: "var(--text-muted)" }}>Format: JPG, PNG</p>
+                  </div>
+                </div>
+              </div>
+              <div className="md:col-span-2 border-t pt-4" style={{ borderColor: "var(--card-border)" }}>
+                <h3 className="text-sm font-semibold mb-3" style={{ color: "var(--text-primary)" }}>Logo Sekolah</h3>
+                <div className="flex items-start gap-4">
+                  {form.logo ? (
+                    <div className="relative group">
+                      <img src={form.logo} alt="Logo" className="w-20 h-20 object-contain rounded-lg" style={{ background: "var(--card)" }} />
+                      <button type="button" onClick={() => update("logo", "")}
+                        className="absolute -top-2 -right-2 p-1.5 rounded-full bg-red-500 text-white opacity-0 group-hover:opacity-100 transition-opacity">
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="w-20 h-20 rounded-lg flex items-center justify-center" style={{ background: "color-mix(in srgb, var(--primary) 8%, var(--card))", border: "2px dashed var(--card-border)" }}>
+                      <Image className="w-8 h-8" style={{ color: "var(--text-muted)" }} />
+                    </div>
+                  )}
+                  <div className="flex-1">
+                    <label className="relative cursor-pointer">
+                      <input type="file" accept="image/*" className="sr-only" onChange={(e) => handleUpload("logo", e.target.files?.[0])} />
+                      <span className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all" style={{ background: "color-mix(in srgb, var(--primary) 10%, transparent)", color: "var(--primary)", border: "1px solid color-mix(in srgb, var(--primary) 30%, transparent)" }}>
+                        {uploading === "logo" ? <><Loader2 className="w-4 h-4 animate-spin" /> Mengunggah...</> : <><Upload className="w-4 h-4" /> Pilih Gambar</>}
+                      </span>
+                    </label>
+                    <p className="text-xs mt-1" style={{ color: "var(--text-muted)" }}>Format: JPG, PNG</p>
+                  </div>
+                </div>
               </div>
             </div>
           </div>

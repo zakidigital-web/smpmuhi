@@ -38,6 +38,7 @@ export default function Navbar() {
   const [showMore, setShowMore] = useState(false);
   const [schoolName, setSchoolName] = useState("SMP Muhammadiyah 1");
   const [schoolSub, setSchoolSub] = useState("Genteng");
+  const [logo, setLogo] = useState("");
   const pathname = usePathname();
   const { theme, toggle } = useTheme();
 
@@ -53,6 +54,7 @@ export default function Navbar() {
           setSchoolName(data.schoolName);
           setSchoolSub("");
         }
+        if (data?.logo) setLogo(data.logo);
       })
       .catch(() => {});
   }, []);
@@ -64,9 +66,13 @@ export default function Navbar() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             <Link href="/" className="flex items-center gap-2 flex-shrink-0 tap-opacity">
-              <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: "var(--primary)" }}>
-                <GraduationCap className="w-6 h-6 text-white" />
-              </div>
+              {logo ? (
+                <img src={logo} alt="Logo" className="w-10 h-10 rounded-xl object-contain" style={{ background: "var(--primary)" }} />
+              ) : (
+                <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: "var(--primary)" }}>
+                  <GraduationCap className="w-6 h-6 text-white" />
+                </div>
+              )}
               <span className="text-lg leading-tight">
                 <span className="font-bold text-xl block -mb-1" style={{ color: "var(--text-primary)" }}>{schoolName}</span>
                 {schoolSub && <span className="text-sm font-semibold" style={{ color: "var(--text-muted)" }}>{schoolSub}</span>}
@@ -177,9 +183,13 @@ export default function Navbar() {
       <nav className="md:hidden fixed top-0 left-0 right-0 z-50 noselect" style={{ background: "var(--nav-bg)", borderBottom: "1px solid var(--nav-border)", paddingTop: "env(safe-area-inset-top, 0px)" }}>
         <div className="flex items-center justify-between px-4" style={{ height: "var(--nav-height-mobile)" }}>
           <Link href="/" className="flex items-center gap-2 tap-opacity">
-            <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: "var(--primary)" }}>
-              <GraduationCap className="w-5 h-5 text-white" />
-            </div>
+            {logo ? (
+              <img src={logo} alt="Logo" className="w-8 h-8 rounded-lg object-contain" style={{ background: "var(--primary)" }} />
+            ) : (
+              <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: "var(--primary)" }}>
+                <GraduationCap className="w-5 h-5 text-white" />
+              </div>
+            )}
             <span className="text-sm font-bold" style={{ color: "var(--text-primary)" }}>
               {schoolName}
             </span>

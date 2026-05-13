@@ -21,10 +21,16 @@ export default function SambutanKepalaSekolah() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid md:grid-cols-2 gap-10 items-center">
           <div className="relative mx-auto w-full max-w-sm">
-            <div className="aspect-[4/5] rounded-2xl flex flex-col items-center justify-center" style={{ background: "color-mix(in srgb, var(--primary) 8%, var(--card))" }}>
-              <GraduationCap className="w-24 h-24" style={{ color: "color-mix(in srgb, var(--primary) 50%, transparent)" }} />
-              <span className="mt-3 text-sm font-medium" style={{ color: "color-mix(in srgb, var(--primary) 35%, transparent)" }}>Kepala Sekolah</span>
-            </div>
+            {settings.fotoKepalaSekolah ? (
+              <div className="aspect-[4/5] rounded-2xl overflow-hidden">
+                <img src={settings.fotoKepalaSekolah} alt="Kepala Sekolah" className="w-full h-full object-cover" />
+              </div>
+            ) : (
+              <div className="aspect-[4/5] rounded-2xl flex flex-col items-center justify-center" style={{ background: "color-mix(in srgb, var(--primary) 8%, var(--card))" }}>
+                <GraduationCap className="w-24 h-24" style={{ color: "color-mix(in srgb, var(--primary) 50%, transparent)" }} />
+                <span className="mt-3 text-sm font-medium" style={{ color: "color-mix(in srgb, var(--primary) 35%, transparent)" }}>Kepala Sekolah</span>
+              </div>
+            )}
             <div className="absolute -bottom-3 -right-3 px-4 py-3 rounded-xl shadow-lg flex items-center gap-2" style={{ background: "var(--secondary)", color: "var(--foreground)" }}>
               <Award className="w-6 h-6" />
               <div>
