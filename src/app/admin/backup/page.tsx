@@ -20,7 +20,7 @@ export default function AdminBackup() {
 
   async function loadBackups() {
     try {
-      const res = await fetch("/api/backup", { method: "GET" });
+      const res = await fetch("/api/backup", { method: "DELETE" });
       const data = await res.json();
       if (data.ok) setBackups(data.files);
     } catch {}
@@ -83,7 +83,7 @@ export default function AdminBackup() {
           </div>
           <div>
             <h2 className="font-semibold" style={{ color: "var(--text-primary)" }}>Status Database</h2>
-            <p className="text-sm" style={{ color: "var(--text-secondary)" }}>SQLite &mdash; {stats?.dbSize || "..."}</p>
+            <p className="text-sm" style={{ color: "var(--text-secondary)" }}>{stats?.engine || "SQLite"} &mdash; {stats?.dbSize || "..."}</p>
           </div>
         </div>
         {stats && (

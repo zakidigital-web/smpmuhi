@@ -26,7 +26,8 @@ export default function AdminLogin() {
       window.location.href = "/admin";
       return;
     }
-    checkDb();
+    const timeout = setTimeout(() => { setDbStatus(false); }, 12000);
+    checkDb().finally(() => clearTimeout(timeout));
     setChecking(false);
   }, []);
 
@@ -37,10 +38,14 @@ export default function AdminLogin() {
         const creds = JSON.parse(saved);
         setTursoUrl(creds.url);
         setTursoToken(creds.authToken);
-        await setupTurso(creds.url, creds.authToken, true);
+        const ok = await setupTurso(creds.url, creds.authToken, true);
+        if (!ok) setDbStatus(false);
         return;
       }
-      const res = await fetch("/api/settings");
+      const controller = new AbortController();
+      const id = setTimeout(() => controller.abort(), 10000);
+      const res = await fetch("/api/settings", { signal: controller.signal });
+      clearTimeout(id);
       setDbStatus(res.ok);
     } catch {
       setDbStatus(false);
