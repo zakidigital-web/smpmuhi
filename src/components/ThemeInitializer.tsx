@@ -5,10 +5,17 @@ import { useEffect } from "react";
 const THEME_CACHE_KEY = "theme_colors";
 
 function applyColors(data: Record<string, string>) {
-  const root = document.documentElement;
-  if (data.primaryColor) root.style.setProperty("--primary", data.primaryColor);
-  if (data.secondaryColor) root.style.setProperty("--secondary", data.secondaryColor);
-  if (data.accentColor) root.style.setProperty("--accent", data.accentColor);
+  let style = document.getElementById("theme-style") as HTMLStyleElement | null;
+  if (!style) {
+    style = document.createElement("style");
+    style.id = "theme-style";
+    document.head.appendChild(style);
+  }
+  let css = "";
+  if (data.primaryColor) css += "--primary:" + data.primaryColor + ";";
+  if (data.secondaryColor) css += "--secondary:" + data.secondaryColor + ";";
+  if (data.accentColor) css += "--accent:" + data.accentColor + ";";
+  style.textContent = ":root{" + css + "}";
 }
 
 export default function ThemeInitializer() {
