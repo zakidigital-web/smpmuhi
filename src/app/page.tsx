@@ -1,15 +1,14 @@
 import Link from "next/link";
-import { Users, Award, GraduationCap, BookOpen, ArrowRight, Calendar, Clock, CheckCircle, Star, Newspaper, Camera, CalendarDays, MapPin } from "lucide-react";
+import { Users, Award, GraduationCap, BookOpen, ArrowRight, Calendar, Clock, CheckCircle, Star, Newspaper, Camera } from "lucide-react";
 import HeroSlider from "@/components/HeroSlider";
+import UpcomingAgenda from "@/components/UpcomingAgenda";
 import { heroSlides } from "@/data/hero";
 import { beritaList } from "@/data/berita";
 import { galeriList } from "@/data/galeri";
-import { agendaList } from "@/data/agenda";
 
 export default function Home() {
   const latestNews = beritaList.slice(0, 5);
   const latestGallery = galeriList.slice(0, 4);
-  const upcomingAgenda = agendaList.slice(0, 4);
 
   return (
     <>
@@ -105,27 +104,7 @@ export default function Home() {
             </Link>
           </div>
 
-          <div className="grid md:grid-cols-2 gap-4">
-            {upcomingAgenda.map((item) => (
-              <Link
-                key={item.id}
-                href="/agenda"
-                className="rounded-xl p-5 flex items-start gap-4 tap-scale"
-                style={{ background: "var(--section-alt)" }}
-              >
-                <div className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: "var(--primary)" }}>
-                  <CalendarDays className="w-6 h-6" style={{ color: "white" }} />
-                </div>
-                <div className="min-w-0">
-                  <h3 className="font-semibold text-sm mb-1 line-clamp-1" style={{ color: "var(--text-primary)" }}>{item.title}</h3>
-                  <div className="flex flex-wrap gap-x-3 gap-y-0.5 text-xs" style={{ color: "var(--text-muted)" }}>
-                    <span className="flex items-center gap-1"><Calendar className="w-3 h-3" />{item.date}</span>
-                    <span className="flex items-center gap-1"><MapPin className="w-3 h-3" />{item.location}</span>
-                  </div>
-                </div>
-              </Link>
-            ))}
-          </div>
+          <UpcomingAgenda />
 
           <div className="text-center mt-6 sm:hidden">
             <Link href="/agenda" className="inline-flex items-center gap-1 font-semibold text-sm" style={{ color: "var(--primary)" }}>
