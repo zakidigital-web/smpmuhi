@@ -34,6 +34,7 @@ const defaultSettings: Record<string, string> = {
   kepalaSekolah: "Abdul Latif, S.Pd.",
   fotoKepalaSekolah: "",
   logo: "",
+  favicon: "",
 };
 
 const sections = [
@@ -283,6 +284,33 @@ export default function AdminSettings() {
                       </span>
                     </label>
                     <p className="text-xs mt-1" style={{ color: "var(--text-muted)" }}>Format: JPG, PNG</p>
+                  </div>
+                </div>
+              </div>
+              <div className="md:col-span-2 border-t pt-4" style={{ borderColor: "var(--card-border)" }}>
+                <h3 className="text-sm font-semibold mb-3" style={{ color: "var(--text-primary)" }}>Favicon</h3>
+                <div className="flex items-start gap-4">
+                  {form.favicon ? (
+                    <div className="relative group">
+                      <img src={form.favicon} alt="Favicon" className="w-10 h-10 object-cover rounded-lg" />
+                      <button type="button" onClick={() => update("favicon", "")}
+                        className="absolute -top-2 -right-2 p-1.5 rounded-full bg-red-500 text-white opacity-0 group-hover:opacity-100 transition-opacity">
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="w-10 h-10 rounded-lg flex items-center justify-center" style={{ background: "color-mix(in srgb, var(--primary) 8%, var(--card))", border: "2px dashed var(--card-border)" }}>
+                      <Image className="w-5 h-5" style={{ color: "var(--text-muted)" }} />
+                    </div>
+                  )}
+                  <div className="flex-1">
+                    <label className="relative cursor-pointer">
+                      <input type="file" accept="image/*" className="sr-only" onChange={(e) => handleUpload("favicon", e.target.files?.[0])} />
+                      <span className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all" style={{ background: "color-mix(in srgb, var(--primary) 10%, transparent)", color: "var(--primary)", border: "1px solid color-mix(in srgb, var(--primary) 30%, transparent)" }}>
+                        {uploading === "favicon" ? <><Loader2 className="w-4 h-4 animate-spin" /> Mengunggah...</> : <><Upload className="w-4 h-4" /> Pilih Gambar</>}
+                      </span>
+                    </label>
+                    <p className="text-xs mt-1" style={{ color: "var(--text-muted)" }}>Format: ICO, PNG, JPG. Ukuran: 32x32 atau 16x16 px ideal</p>
                   </div>
                 </div>
               </div>

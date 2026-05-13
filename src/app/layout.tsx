@@ -24,7 +24,7 @@ async function getSettings() {
   try {
     const { query } = await import("@/lib/database");
     const rows = await query<{ key: string; value: string }>(
-      "SELECT key, value FROM settings WHERE key IN ('schoolName', 'shortName', 'primaryColor')"
+      "SELECT key, value FROM settings WHERE key IN ('schoolName', 'shortName', 'primaryColor', 'favicon')"
     );
     const map: Record<string, string> = {};
     rows.forEach((r: any) => { map[r.key] = r.value; });
@@ -44,6 +44,9 @@ export async function generateMetadata(): Promise<Metadata> {
     description: `Website resmi ${name} Banyuwangi - SPMB Online, Program Unggulan, Akreditasi A, Fasilitas Lengkap`,
     keywords: "SMP, Muhammadiyah, Genteng, Banyuwangi, SPMB, SPMB, Sekolah Islam",
     manifest: "/manifest.webmanifest",
+    icons: {
+      icon: settings.favicon || "/favicon.ico",
+    },
     appleWebApp: {
       capable: true,
       title: short,

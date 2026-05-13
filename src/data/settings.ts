@@ -26,6 +26,7 @@ export type SiteSettings = {
   kepalaSekolah: string;
   fotoKepalaSekolah: string;
   logo: string;
+  favicon: string;
   adminPassword: string;
 };
 
@@ -57,5 +58,6 @@ export const siteSettings: SiteSettings = {
   kepalaSekolah: "Abdul Latif, S.Pd.",
   fotoKepalaSekolah: "",
   logo: "",
+  favicon: "",
   adminPassword: "240be518fabd2724ddb6f04eeb1da5967448d7e831c08c8fa822809f74c720a9",
 };

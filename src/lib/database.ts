@@ -118,101 +118,78 @@ export function resetDb() {
   adapter = null;
 }
 
+export async function factoryResetDb() {
+  const db = await getDb();
+  await db.exec(`
+    DROP TABLE IF EXISTS comments;
+    DROP TABLE IF EXISTS spmb_registrations;
+    DROP TABLE IF EXISTS settings;
+    DROP TABLE IF EXISTS agenda;
+    DROP TABLE IF EXISTS galeri;
+    DROP TABLE IF EXISTS berita;
+    DROP TABLE IF EXISTS hero
+  `);
+  resetDb();
+  await getDb();
+}
+
 async function initTables() {
   const db = adapter!;
   await db.exec(`
     CREATE TABLE IF NOT EXISTS hero (
-      id TEXT PRIMARY KEY,
-      headline TEXT NOT NULL DEFAULT '',
-      tagline TEXT NOT NULL DEFAULT '',
-      description TEXT NOT NULL DEFAULT '',
-      ctaText TEXT NOT NULL DEFAULT '',
-      ctaHref TEXT NOT NULL DEFAULT '',
-      ctaSecondaryText TEXT DEFAULT '',
-      ctaSecondaryHref TEXT DEFAULT '',
-      gradient TEXT NOT NULL DEFAULT '',
-      active INTEGER NOT NULL DEFAULT 1,
+      id TEXT PRIMARY KEY, headline TEXT NOT NULL DEFAULT '',
+      tagline TEXT NOT NULL DEFAULT '', description TEXT NOT NULL DEFAULT '',
+      ctaText TEXT NOT NULL DEFAULT '', ctaHref TEXT NOT NULL DEFAULT '',
+      ctaSecondaryText TEXT DEFAULT '', ctaSecondaryHref TEXT DEFAULT '',
+      gradient TEXT NOT NULL DEFAULT '', active INTEGER NOT NULL DEFAULT 1,
       sort_order INTEGER NOT NULL DEFAULT 0
     );
-  `);
-  await db.exec(`
     CREATE TABLE IF NOT EXISTS berita (
-      id TEXT PRIMARY KEY,
-      title TEXT NOT NULL DEFAULT '',
-      excerpt TEXT NOT NULL DEFAULT '',
-      content TEXT NOT NULL DEFAULT '',
-      date TEXT NOT NULL DEFAULT '',
-      author TEXT NOT NULL DEFAULT '',
-      category TEXT NOT NULL DEFAULT '',
-      slug TEXT NOT NULL DEFAULT ''
+      id TEXT PRIMARY KEY, title TEXT NOT NULL DEFAULT '',
+      excerpt TEXT NOT NULL DEFAULT '', content TEXT NOT NULL DEFAULT '',
+      date TEXT NOT NULL DEFAULT '', author TEXT NOT NULL DEFAULT '',
+      category TEXT NOT NULL DEFAULT '', slug TEXT NOT NULL DEFAULT ''
     );
-  `);
-  await db.exec(`
     CREATE TABLE IF NOT EXISTS galeri (
-      id TEXT PRIMARY KEY,
-      title TEXT NOT NULL DEFAULT '',
-      category TEXT NOT NULL DEFAULT '',
-      desc TEXT NOT NULL DEFAULT '',
-      media_type TEXT NOT NULL DEFAULT 'photo',
-      url TEXT NOT NULL DEFAULT ''
+      id TEXT PRIMARY KEY, title TEXT NOT NULL DEFAULT '',
+      category TEXT NOT NULL DEFAULT '', desc TEXT NOT NULL DEFAULT '',
+      media_type TEXT NOT NULL DEFAULT 'photo', url TEXT NOT NULL DEFAULT ''
     );
-  `);
-  await db.exec(`
     CREATE TABLE IF NOT EXISTS agenda (
-      id TEXT PRIMARY KEY,
-      title TEXT NOT NULL DEFAULT '',
-      date TEXT NOT NULL DEFAULT '',
-      time TEXT NOT NULL DEFAULT '',
-      location TEXT NOT NULL DEFAULT '',
-      description TEXT NOT NULL DEFAULT '',
+      id TEXT PRIMARY KEY, title TEXT NOT NULL DEFAULT '',
+      date TEXT NOT NULL DEFAULT '', time TEXT NOT NULL DEFAULT '',
+      location TEXT NOT NULL DEFAULT '', description TEXT NOT NULL DEFAULT '',
       type TEXT NOT NULL DEFAULT ''
     );
-  `);
-  await db.exec(`
     CREATE TABLE IF NOT EXISTS spmb_registrations (
-      id TEXT PRIMARY KEY,
-      nomor_pendaftaran TEXT UNIQUE NOT NULL,
-      nama_lengkap TEXT NOT NULL,
-      nisn TEXT NOT NULL,
-      tempat_lahir TEXT NOT NULL,
-      tanggal_lahir TEXT NOT NULL,
-      jenis_kelamin TEXT NOT NULL,
-      agama TEXT NOT NULL,
-      alamat TEXT NOT NULL,
-      nama_ayah TEXT NOT NULL,
-      pekerjaan_ayah TEXT NOT NULL,
-      no_hp_ortu TEXT NOT NULL,
-      nama_ibu TEXT NOT NULL,
-      pekerjaan_ibu TEXT NOT NULL,
-      nama_sekolah TEXT NOT NULL,
-      alamat_sekolah TEXT NOT NULL,
-      program_pilihan TEXT NOT NULL,
-      status TEXT NOT NULL DEFAULT 'menunggu',
+      id TEXT PRIMARY KEY, nomor_pendaftaran TEXT UNIQUE NOT NULL,
+      nama_lengkap TEXT NOT NULL, nisn TEXT NOT NULL,
+      tempat_lahir TEXT NOT NULL, tanggal_lahir TEXT NOT NULL,
+      jenis_kelamin TEXT NOT NULL, agama TEXT NOT NULL,
+      alamat TEXT NOT NULL, nama_ayah TEXT NOT NULL,
+      pekerjaan_ayah TEXT NOT NULL, no_hp_ortu TEXT NOT NULL,
+      nama_ibu TEXT NOT NULL, pekerjaan_ibu TEXT NOT NULL,
+      nama_sekolah TEXT NOT NULL, alamat_sekolah TEXT NOT NULL,
+      program_pilihan TEXT NOT NULL, status TEXT NOT NULL DEFAULT 'menunggu',
       created_at TEXT NOT NULL
     );
-  `);
-  await db.exec(`
-    CREATE TABLE IF NOT EXISTS settings (
-      key TEXT PRIMARY KEY,
-      value TEXT NOT NULL DEFAULT ''
-    );
-  `);
-  await db.exec(`
+    CREATE TABLE IF NOT EXISTS settings (key TEXT PRIMARY KEY, value TEXT NOT NULL DEFAULT '');
     CREATE TABLE IF NOT EXISTS comments (
-      id TEXT PRIMARY KEY,
-      berita_id TEXT NOT NULL,
-      name TEXT NOT NULL DEFAULT 'Anonim',
-      content TEXT NOT NULL,
-      created_at TEXT NOT NULL,
-      FOREIGN KEY (berita_id) REFERENCES berita(id)
+      id TEXT PRIMARY KEY, berita_id TEXT NOT NULL,
+      name TEXT NOT NULL DEFAULT 'Anonim', content TEXT NOT NULL,
+      created_at TEXT NOT NULL, FOREIGN KEY (berita_id) REFERENCES berita(id)
     )
   `);
 
-  try { await db.exec("ALTER TABLE galeri ADD COLUMN media_type TEXT NOT NULL DEFAULT 'photo'"); } catch {}
-  try { await db.exec("ALTER TABLE galeri ADD COLUMN url TEXT NOT NULL DEFAULT ''"); } catch {}
-  try { await db.exec("ALTER TABLE berita ADD COLUMN image TEXT NOT NULL DEFAULT ''"); } catch {}
-  try { await db.exec("ALTER TABLE hero ADD COLUMN image TEXT NOT NULL DEFAULT ''"); } catch {}
-  try { await db.exec("ALTER TABLE berita ADD COLUMN allow_comments INTEGER NOT NULL DEFAULT 1"); } catch {}
+  try {
+    await db.exec(`
+      ALTER TABLE galeri ADD COLUMN media_type TEXT NOT NULL DEFAULT 'photo';
+      ALTER TABLE galeri ADD COLUMN url TEXT NOT NULL DEFAULT '';
+      ALTER TABLE berita ADD COLUMN image TEXT NOT NULL DEFAULT '';
+      ALTER TABLE hero ADD COLUMN image TEXT NOT NULL DEFAULT '';
+      ALTER TABLE berita ADD COLUMN allow_comments INTEGER NOT NULL DEFAULT 1
+    `);
+  } catch {}
 
   const count = await db.queryOne<{ c: number }>("SELECT COUNT(*) as c FROM hero");
   if (count && count.c === 0) await seedData();
@@ -220,63 +197,53 @@ async function initTables() {
 
 async function seedData() {
   const db = adapter!;
-  for (const [i, s] of heroSlides.entries()) {
-    await db.execute(
-      `INSERT INTO hero (id, headline, tagline, description, ctaText, ctaHref, ctaSecondaryText, ctaSecondaryHref, gradient, active, sort_order)
-       VALUES (@id, @headline, @tagline, @description, @ctaText, @ctaHref, @ctaSecondaryText, @ctaSecondaryHref, @gradient, @active, @sort_order)`,
-      { ...s, active: s.active ? 1 : 0, sort_order: i } as any
-    );
-  }
-  for (const b of beritaList) {
-    await db.execute(
-      `INSERT INTO berita (id, title, excerpt, content, date, author, category, slug)
-       VALUES (@id, @title, @excerpt, @content, @date, @author, @category, @slug)`,
-      b as any
-    );
-  }
-  for (const g of galeriList) {
-    await db.execute(
-      `INSERT INTO galeri (id, title, category, desc, media_type, url)
-       VALUES (@id, @title, @category, @desc, @media_type, @url)`,
-      g as any
-    );
-  }
-  for (const a of agendaList) {
-    await db.execute(
-      `INSERT INTO agenda (id, title, date, time, location, description, type)
-       VALUES (@id, @title, @date, @time, @location, @description, @type)`,
-      a as any
-    );
-  }
-  for (const [key, value] of Object.entries(siteSettings)) {
-    await db.execute("INSERT INTO settings (key, value) VALUES (@key, @value)", { key, value: String(value) });
-  }
+  const esc = (v: any) => v == null ? "NULL" : `'${String(v).replace(/'/g, "''")}'`;
 
-  const dummyRegistrations = [
-    { nama_lengkap: "Ahmad Fauzi", nisn: "1234567890", tempat_lahir: "Banyuwangi", tanggal_lahir: "2011-08-15", jenis_kelamin: "L", agama: "Islam", alamat: "Jl. Merdeka No.10, Genteng", nama_ayah: "Suparman", pekerjaan_ayah: "Petani", no_hp_ortu: "081234567890", nama_ibu: "Siti Aminah", pekerjaan_ibu: "Ibu Rumah Tangga", nama_sekolah: "SD Negeri 1 Genteng", alamat_sekolah: "Jl. Raya Genteng No.1", program_pilihan: "Reguler", status: "diterima", nomor_pendaftaran: "SPMB-240101001", created_at: "2026-01-15T08:30:00.000Z" },
-    { nama_lengkap: "Nurul Hidayah", nisn: "2234567891", tempat_lahir: "Banyuwangi", tanggal_lahir: "2011-12-20", jenis_kelamin: "P", agama: "Islam", alamat: "Ds. Krajan, Kec. Genteng", nama_ayah: "Hasanudin", pekerjaan_ayah: "Guru", no_hp_ortu: "082345678901", nama_ibu: "Fatimah", pekerjaan_ibu: "Guru", nama_sekolah: "SD Muhammadiyah 1 Genteng", alamat_sekolah: "Jl. Pesantren No.5", program_pilihan: "Reguler", status: "menunggu", nomor_pendaftaran: "SPMB-240201002", created_at: "2026-02-20T10:15:00.000Z" },
-    { nama_lengkap: "Dimas Prasetyo", nisn: "3234567892", tempat_lahir: "Jember", tanggal_lahir: "2012-03-10", jenis_kelamin: "L", agama: "Islam", alamat: "Perum Griya Asri Blok A5, Genteng", nama_ayah: "Agus Prasetyo", pekerjaan_ayah: "Wiraswasta", no_hp_ortu: "083456789012", nama_ibu: "Dewi Sartika", pekerjaan_ibu: "Perawat", nama_sekolah: "SD Negeri 2 Genteng", alamat_sekolah: "Jl. Pendidikan No.10", program_pilihan: "Prestasi", status: "diterima", nomor_pendaftaran: "SPMB-240301003", created_at: "2026-03-05T14:00:00.000Z" },
+  const heroSQL = heroSlides.map((s, i) =>
+    `INSERT INTO hero (id,headline,tagline,description,ctaText,ctaHref,ctaSecondaryText,ctaSecondaryHref,gradient,active,sort_order) VALUES (${[esc(s.id), esc(s.headline), esc(s.tagline), esc(s.description), esc(s.ctaText), esc(s.ctaHref), esc(s.ctaSecondaryText ?? ""), esc(s.ctaSecondaryHref ?? ""), esc(s.gradient), esc(s.active ? 1 : 0), esc(i)].join(",")})`
+  ).join(";\n");
+  await db.exec(heroSQL);
+
+  const beritaSQL = beritaList.map(b =>
+    `INSERT INTO berita (id,title,excerpt,content,date,author,category,slug) VALUES (${[esc(b.id), esc(b.title), esc(b.excerpt), esc(b.content), esc(b.date), esc(b.author), esc(b.category), esc(b.slug)].join(",")})`
+  ).join(";\n");
+  await db.exec(beritaSQL);
+
+  const galeriSQL = galeriList.map(g =>
+    `INSERT INTO galeri (id,title,category,"desc",media_type,url) VALUES (${[esc(g.id), esc(g.title), esc(g.category), esc(g.desc), esc(g.media_type), esc(g.url)].join(",")})`
+  ).join(";\n");
+  await db.exec(galeriSQL);
+
+  const agendaSQL = agendaList.map(a =>
+    `INSERT INTO agenda (id,title,date,time,location,description,type) VALUES (${[esc(a.id), esc(a.title), esc(a.date), esc(a.time), esc(a.location), esc(a.description), esc(a.type)].join(",")})`
+  ).join(";\n");
+  await db.exec(agendaSQL);
+
+  const settingsSQL = Object.entries(siteSettings).map(([k, v]) =>
+    `INSERT INTO settings (key,value) VALUES (${esc(k)},${esc(String(v))})`
+  ).join(";\n");
+  await db.exec(settingsSQL);
+
+  const regRows = [
+    { id: "DUM-SPMB-240101001", n: "Ahmad Fauzi", ns: "1234567890", tl: "Banyuwangi", tgl: "2011-08-15", jk: "L", a: "Islam", al: "Jl. Merdeka No.10, Genteng", na: "Suparman", pa: "Petani", hp: "081234567890", ni: "Siti Aminah", pi: "Ibu Rumah Tangga", ns_: "SD Negeri 1 Genteng", al_: "Jl. Raya Genteng No.1", pp: "Reguler", s: "diterima", np: "SPMB-240101001", ca: "2026-01-15T08:30:00.000Z" },
+    { id: "DUM-SPMB-240201002", n: "Nurul Hidayah", ns: "2234567891", tl: "Banyuwangi", tgl: "2011-12-20", jk: "P", a: "Islam", al: "Ds. Krajan, Kec. Genteng", na: "Hasanudin", pa: "Guru", hp: "082345678901", ni: "Fatimah", pi: "Guru", ns_: "SD Muhammadiyah 1 Genteng", al_: "Jl. Pesantren No.5", pp: "Reguler", s: "menunggu", np: "SPMB-240201002", ca: "2026-02-20T10:15:00.000Z" },
+    { id: "DUM-SPMB-240301003", n: "Dimas Prasetyo", ns: "3234567892", tl: "Jember", tgl: "2012-03-10", jk: "L", a: "Islam", al: "Perum Griya Asri Blok A5, Genteng", na: "Agus Prasetyo", pa: "Wiraswasta", hp: "083456789012", ni: "Dewi Sartika", pi: "Perawat", ns_: "SD Negeri 2 Genteng", al_: "Jl. Pendidikan No.10", pp: "Prestasi", s: "diterima", np: "SPMB-240301003", ca: "2026-03-05T14:00:00.000Z" },
   ];
-  for (const r of dummyRegistrations) {
-    const id = "DUM-" + r.nomor_pendaftaran;
-    await db.execute(
-      `INSERT INTO spmb_registrations (id, nomor_pendaftaran, nama_lengkap, nisn, tempat_lahir, tanggal_lahir, jenis_kelamin, agama, alamat, nama_ayah, pekerjaan_ayah, no_hp_ortu, nama_ibu, pekerjaan_ibu, nama_sekolah, alamat_sekolah, program_pilihan, status, created_at)
-       VALUES (@id, @nomor_pendaftaran, @nama_lengkap, @nisn, @tempat_lahir, @tanggal_lahir, @jenis_kelamin, @agama, @alamat, @nama_ayah, @pekerjaan_ayah, @no_hp_ortu, @nama_ibu, @pekerjaan_ibu, @nama_sekolah, @alamat_sekolah, @program_pilihan, @status, @created_at)`,
-      { ...r, id } as any
-    );
-  }
+  const regSQL = regRows.map(r =>
+    `INSERT INTO spmb_registrations (id,nomor_pendaftaran,nama_lengkap,nisn,tempat_lahir,tanggal_lahir,jenis_kelamin,agama,alamat,nama_ayah,pekerjaan_ayah,no_hp_ortu,nama_ibu,pekerjaan_ibu,nama_sekolah,alamat_sekolah,program_pilihan,status,created_at) VALUES (${esc(r.id)},${esc(r.np)},${esc(r.n)},${esc(r.ns)},${esc(r.tl)},${esc(r.tgl)},${esc(r.jk)},${esc(r.a)},${esc(r.al)},${esc(r.na)},${esc(r.pa)},${esc(r.hp)},${esc(r.ni)},${esc(r.pi)},${esc(r.ns_)},${esc(r.al_)},${esc(r.pp)},${esc(r.s)},${esc(r.ca)})`
+  ).join(";\n");
+  await db.exec(regSQL);
 
-  const dummyComments = [
+  const now = Date.now();
+  const cmtRows = [
     { name: "Ani", content: "Informasi pendaftarannya sangat jelas. Terima kasih.", created_at: "2026-01-16T09:00:00.000Z" },
     { name: "Budi Santoso", content: "Apakah ada jalur beasiswa untuk siswa kurang mampu?", created_at: "2026-01-18T14:30:00.000Z" },
     { name: "Citra Dewi", content: "Anak saya sudah daftar, semoga diterima! Aamiin.", created_at: "2026-02-01T07:15:00.000Z" },
   ];
-  for (const c of dummyComments) {
-    await db.execute(
-      "INSERT INTO comments (id, berita_id, name, content, created_at) VALUES (@id, @berita_id, @name, @content, @created_at)",
-      { id: "c" + Date.now() + Math.random().toString(36).slice(2, 6), berita_id: "1", ...c }
-    );
-  }
+  const cmtSQL = cmtRows.map((c, i) =>
+    `INSERT INTO comments (id,berita_id,name,content,created_at) VALUES (${esc("c" + (now + i) + Math.random().toString(36).slice(2, 6))},${esc("1")},${esc(c.name)},${esc(c.content)},${esc(c.created_at)})`
+  ).join(";\n");
+  await db.exec(cmtSQL);
 }
 
 

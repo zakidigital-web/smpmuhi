@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Database, Download, Upload, RefreshCw, Check, AlertCircle, HardDrive } from "lucide-react";
+import { Database, Download, Upload, RefreshCw, Check, AlertCircle, HardDrive, Trash2 } from "lucide-react";
 
 export default function AdminBackup() {
   const [stats, setStats] = useState<any>(null);
@@ -9,6 +9,9 @@ export default function AdminBackup() {
   const [loading, setLoading] = useState(false);
   const [restoring, setRestoring] = useState(false);
   const [message, setMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
+  const [showResetConfirm, setShowResetConfirm] = useState(false);
+  const [resetConfirmText, setResetConfirmText] = useState("");
+  const [resetLoading, setResetLoading] = useState(false);
 
   useEffect(() => {
     fetch("/api/stats").then((r) => r.json()).then(setStats).catch(() => {});
@@ -191,6 +194,68 @@ export default function AdminBackup() {
               </div>
             ))}
           </div>
+        )}
+      </div>
+
+      {/* Reset Database */}
+      <div className="rounded-xl p-6" style={{ background: "color-mix(in srgb, var(--error) 8%, var(--card))", border: "1px solid color-mix(in srgb, var(--error) 30%, transparent)" }}>
+        <h2 className="font-semibold mb-2 flex items-center gap-2" style={{ color: "var(--error)" }}>
+          <AlertCircle className="w-5 h-5" />
+          Reset Database
+        </h2>
+        <p className="text-sm mb-4" style={{ color: "var(--text-secondary)" }}>
+          Hapus semua data dan kembalikan database ke keadaan awal (data dummy akan diisi ulang).
+          Tindakan ini <strong>tidak dapat dibatalkan</strong>.
+        </p>
+        {showResetConfirm ? (
+          <div className="space-y-3">
+            <p className="text-xs" style={{ color: "var(--text-muted)" }}>
+              Ketik <strong>HAPUS</strong> untuk konfirmasi:
+            </p>
+            <input value={resetConfirmText} onChange={(e) => setResetConfirmText(e.target.value)}
+              className="w-full max-w-xs px-3 py-2 border rounded-lg text-sm outline-none"
+              style={{ borderColor: "var(--error)", background: "var(--background)", color: "var(--text-primary)" }}
+              placeholder="Ketik HAPUS" />
+            <div className="flex gap-2">
+              <button onClick={async () => {
+                setResetLoading(true);
+                setMessage(null);
+                try {
+                  const res = await fetch("/api/database-reset", { method: "POST" });
+                  const data = await res.json();
+                  if (data.ok) {
+                    setMessage({ type: "success", text: data.message });
+                    const s = await fetch("/api/stats").then((r) => r.json());
+                    setStats(s);
+                  } else {
+                    setMessage({ type: "error", text: data.error || "Gagal mereset database" });
+                  }
+                } catch {
+                  setMessage({ type: "error", text: "Gagal mereset database" });
+                }
+                setResetLoading(false);
+                setShowResetConfirm(false);
+                setResetConfirmText("");
+              }} disabled={resetConfirmText !== "HAPUS" || resetLoading}
+                className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold text-white transition-colors disabled:opacity-50"
+                style={{ background: "var(--error)" }}>
+                {resetLoading ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Trash2 className="w-4 h-4" />}
+                {resetLoading ? "Mereset..." : "Ya, Reset Database"}
+              </button>
+              <button onClick={() => { setShowResetConfirm(false); setResetConfirmText(""); }}
+                className="px-5 py-2.5 rounded-xl text-sm font-semibold transition-colors"
+                style={{ background: "var(--card)", color: "var(--text-secondary)", border: "1px solid var(--card-border)" }}>
+                Batal
+              </button>
+            </div>
+          </div>
+        ) : (
+          <button onClick={() => setShowResetConfirm(true)}
+            className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold text-white transition-colors"
+            style={{ background: "var(--error)" }}>
+            <AlertCircle className="w-4 h-4" />
+            Hapus Database & Mulai Awal
+          </button>
         )}
       </div>
     </div>
