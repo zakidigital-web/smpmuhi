@@ -20,6 +20,8 @@ const defaultSettings: Record<string, string> = {
   sppmYear: "2026",
   footerDescription: "Sekolah menengah pertama unggulan di bawah naungan Muhammadiyah, berkomitmen mencetak generasi berakhlak mulia, berilmu, dan berkemajuan.",
   copyright: "All rights reserved.",
+  gmapsLat: "-8.360388",
+  gmapsLng: "114.159599",
 };
 
 export default function AdminSettings() {
@@ -144,6 +146,32 @@ export default function AdminSettings() {
               <input value={form.youtube} onChange={(e) => update("youtube", e.target.value)}
                 className={inputClass} style={{ borderColor: "var(--card-border)", background: "var(--background)", color: "var(--text-primary)" }} />
             </div>
+          </div>
+        </div>
+
+        <div style={sectionStyle}>
+          <h2 className="text-lg font-semibold mb-4" style={{ color: "var(--text-primary)" }}>Google Maps</h2>
+          <p className="text-xs mb-3" style={{ color: "var(--text-muted)" }}>Koordinat lokasi sekolah untuk tampilan peta di halaman Kontak.</p>
+          <div className="grid md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium" style={labelStyle}>Latitude</label>
+              <input value={form.gmapsLat} onChange={(e) => update("gmapsLat", e.target.value)}
+                className={inputClass} style={{ borderColor: "var(--card-border)", background: "var(--background)", color: "var(--text-primary)" }} placeholder="-8.360388" />
+            </div>
+            <div>
+              <label className="block text-sm font-medium" style={labelStyle}>Longitude</label>
+              <input value={form.gmapsLng} onChange={(e) => update("gmapsLng", e.target.value)}
+                className={inputClass} style={{ borderColor: "var(--card-border)", background: "var(--background)", color: "var(--text-primary)" }} placeholder="114.159599" />
+            </div>
+          </div>
+          <div className="mt-3 rounded-xl overflow-hidden h-40" style={{ border: "1px solid var(--card-border)" }}>
+            <iframe
+              src={`https://maps.google.com/maps?q=${form.gmapsLat || "-8.360388"},${form.gmapsLng || "114.159599"}&z=14&output=embed`}
+              className="w-full h-full"
+              loading="lazy"
+              style={{ border: 0 }}
+              title="Pratinjau Google Maps"
+            />
           </div>
         </div>
 

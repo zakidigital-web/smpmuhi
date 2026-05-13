@@ -12,6 +12,8 @@ export type SiteSettings = {
   secondaryColor: string;
   accentColor: string;
   sppmYear: string;
+  gmapsLat: string;
+  gmapsLng: string;
 };
 
 export const siteSettings: SiteSettings = {
@@ -28,4 +30,6 @@ export const siteSettings: SiteSettings = {
   secondaryColor: "#F59E0B",
   accentColor: "#1565C0",
   sppmYear: "2026",
+  gmapsLat: "-8.360388",
+  gmapsLng: "114.159599",
 };
