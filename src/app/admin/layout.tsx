@@ -26,12 +26,16 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const [mounted, setMounted] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [dbStatus, setDbStatus] = useState<{ status: string; dbSize: string; totalRows: number } | null>(null);
+  const [siteName, setSiteName] = useState("SMP Muhammadiyah 1 Genteng");
 
   useEffect(() => {
     const loggedIn = localStorage.getItem("admin_logged_in") === "true";
     setIsLoggedIn(loggedIn);
     setMounted(true);
     fetch("/api/stats").then((r) => r.json()).then(setDbStatus).catch(() => {});
+    fetch("/api/settings").then((r) => r.json()).then((data) => {
+      if (data?.schoolName) setSiteName(data.schoolName);
+    }).catch(() => {});
   }, []);
 
   useEffect(() => {
@@ -93,7 +97,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             </div>
             <div>
               <div className="font-bold" style={{ color: "var(--text-primary)" }}>Admin Panel</div>
-              <div className="text-xs" style={{ color: "var(--text-muted)" }}>SMP Mutiara Genteng</div>
+              <div className="text-xs" style={{ color: "var(--text-muted)" }}>{siteName}</div>
             </div>
           </Link>
         </div>

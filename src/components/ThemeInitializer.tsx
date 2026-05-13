@@ -18,6 +18,11 @@ function applyColors(data: Record<string, string>) {
   style.textContent = ":root{" + css + "}";
 }
 
+function updateMeta(name: string, content: string) {
+  const el = document.querySelector(`meta[name="${name}"]`);
+  if (el) el.setAttribute("content", content);
+}
+
 export default function ThemeInitializer() {
   useEffect(() => {
     fetch("/api/settings")
@@ -25,20 +30,19 @@ export default function ThemeInitializer() {
       .then((data) => {
         if (!data || typeof data !== "object") return;
         applyColors(data as Record<string, string>);
-        try { localStorage.setItem(THEME_CACHE_KEY, JSON.stringify(data)); } catch {}
+        try {
+          localStorage.setItem(THEME_CACHE_KEY, JSON.stringify(data));
+          localStorage.setItem("site_identity", JSON.stringify({
+            schoolName: data.schoolName,
+            shortName: data.shortName,
+          }));
+        } catch {}
+        updateMeta("application-name", data.shortName || data.schoolName || "SMP Muhammadiyah 1 Genteng");
+        updateMeta("apple-mobile-web-app-title", data.shortName || data.schoolName || "SMP Muhammadiyah 1 Genteng");
+        if (data.primaryColor) updateMeta("theme-color", data.primaryColor);
       })
       .catch(() => {});
   }, []);
 
   return null;
-}
-
-export function getCachedTheme(): Record<string, string> | null {
-  if (typeof window === "undefined") return null;
-  try {
-    const raw = localStorage.getItem(THEME_CACHE_KEY);
-    return raw ? JSON.parse(raw) : null;
-  } catch {
-    return null;
-  }
 }
