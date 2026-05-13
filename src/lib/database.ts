@@ -71,7 +71,14 @@ function createTursoAdapter(config: TursoConfig): DbAdapter {
   };
 
   const exec = async (sql: string) => {
-    await client.execute(sql);
+    const stmts = sql.split(';').map(s => s.trim()).filter(s => s.length > 0);
+    if (stmts.length <= 1) {
+      await client.execute(sql);
+    } else {
+      for (const stmt of stmts) {
+        await client.execute(stmt);
+      }
+    }
   };
 
   return { query, queryOne, execute, exec, isTurso: true, name: config.url };
