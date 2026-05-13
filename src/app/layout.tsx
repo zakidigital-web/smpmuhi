@@ -23,7 +23,7 @@ const inter = Inter({
 async function getSettings() {
   try {
     const { query } = await import("@/lib/database");
-    const rows = query<{ key: string; value: string }>(
+    const rows = await query<{ key: string; value: string }>(
       "SELECT key, value FROM settings WHERE key IN ('schoolName', 'shortName', 'primaryColor')"
     );
     const map: Record<string, string> = {};

@@ -29,12 +29,17 @@ function listBackups() {
 
 export async function GET() {
   try {
-    const db = getDb();
+    const db = await getDb();
+
+    if (db.isTurso) {
+      return NextResponse.json({ ok: false, error: "Backup file tidak tersedia untuk database cloud (Turso). Gunakan Turso CLI untuk backup." }, { status: 400 });
+    }
+
     const sourcePath = db.name;
     const timestamp = new Date().toISOString().replace(/[:.]/g, "-");
     const backupPath = path.join(getBackupDir(), `backup-${timestamp}.db`);
 
-    db.backup(backupPath);
+    fs.copyFileSync(sourcePath, backupPath);
 
     const stat = fs.statSync(backupPath);
     const size =
@@ -57,6 +62,12 @@ export async function GET() {
 
 export async function POST(request: Request) {
   try {
+    const db = await getDb();
+
+    if (db.isTurso) {
+      return NextResponse.json({ ok: false, error: "Restore file tidak tersedia untuk database cloud (Turso)." }, { status: 400 });
+    }
+
     const formData = await request.formData();
     const file = formData.get("file") as File | null;
 
@@ -68,7 +79,6 @@ export async function POST(request: Request) {
       return NextResponse.json({ ok: false, error: "File must be a .db file" }, { status: 400 });
     }
 
-    const db = getDb();
     const targetPath = db.name;
     const buffer = Buffer.from(await file.arrayBuffer());
     fs.writeFileSync(targetPath, buffer);

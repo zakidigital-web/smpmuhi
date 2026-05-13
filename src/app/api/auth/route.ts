@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import crypto from "crypto";
-import { queryOne, execute, getDb } from "@/lib/database";
+import { queryOne, execute } from "@/lib/database";
 
 function hashPassword(password: string): string {
   return crypto.createHash("sha256").update(password).digest("hex");
@@ -17,7 +17,7 @@ export async function POST(request: Request) {
     if (username !== "admin") {
       return NextResponse.json({ error: "Username atau password salah" }, { status: 401 });
     }
-    const row = queryOne<{ value: string }>("SELECT value FROM settings WHERE key = 'adminPassword'");
+    const row = await queryOne<{ value: string }>("SELECT value FROM settings WHERE key = 'adminPassword'");
     const storedHash = row?.value || hashPassword("admin123");
     if (hashPassword(password) !== storedHash) {
       return NextResponse.json({ error: "Username atau password salah" }, { status: 401 });
@@ -32,12 +32,12 @@ export async function POST(request: Request) {
     if (newPassword.length < 6) {
       return NextResponse.json({ error: "Password baru minimal 6 karakter" }, { status: 400 });
     }
-    const row = queryOne<{ value: string }>("SELECT value FROM settings WHERE key = 'adminPassword'");
+    const row = await queryOne<{ value: string }>("SELECT value FROM settings WHERE key = 'adminPassword'");
     const storedHash = row?.value || hashPassword("admin123");
     if (hashPassword(password) !== storedHash) {
       return NextResponse.json({ error: "Password lama salah" }, { status: 401 });
     }
-    execute(
+    await execute(
       `INSERT INTO settings (key, value) VALUES ('adminPassword', @value) ON CONFLICT(key) DO UPDATE SET value=@value`,
       { value: hashPassword(newPassword) }
     );

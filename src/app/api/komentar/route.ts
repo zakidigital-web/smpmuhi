@@ -7,7 +7,7 @@ export async function GET(request: Request) {
   if (!berita_id) {
     return NextResponse.json({ error: "berita_id required" }, { status: 400 });
   }
-  const items = query(
+  const items = await query(
     "SELECT * FROM comments WHERE berita_id = @berita_id ORDER BY created_at ASC",
     { berita_id }
   );
@@ -21,14 +21,14 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "berita_id and content required" }, { status: 400 });
   }
 
-  const berita = queryOne("SELECT allow_comments FROM berita WHERE id = @id", { id: berita_id }) as { allow_comments: number } | undefined;
+  const berita = await queryOne("SELECT allow_comments FROM berita WHERE id = @id", { id: berita_id }) as { allow_comments: number } | undefined;
   if (!berita || !berita.allow_comments) {
     return NextResponse.json({ error: "Komentar tidak diizinkan untuk artikel ini" }, { status: 403 });
   }
 
   const id = Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
   const now = new Date().toISOString();
-  execute(
+  await execute(
     "INSERT INTO comments (id, berita_id, name, content, created_at) VALUES (@id, @berita_id, @name, @content, @created_at)",
     { id, berita_id, name: name || "Anonim", content, created_at: now }
   );
@@ -38,6 +38,6 @@ export async function POST(request: Request) {
 
 export async function DELETE(request: Request) {
   const { id } = await request.json();
-  execute("DELETE FROM comments WHERE id = @id", { id });
+  await execute("DELETE FROM comments WHERE id = @id", { id });
   return NextResponse.json({ ok: true });
 }

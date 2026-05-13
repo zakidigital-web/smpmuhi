@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { query, execute, queryOne } from "@/lib/database";
 
 export async function GET() {
-  const items = query("SELECT * FROM spmb_registrations ORDER BY created_at DESC");
+  const items = await query("SELECT * FROM spmb_registrations ORDER BY created_at DESC");
   return NextResponse.json(items);
 }
 
@@ -21,7 +21,7 @@ export async function POST(request: Request) {
     const nomor_pendaftaran = "SPMB-" + Date.now().toString().slice(-8);
     const created_at = new Date().toISOString();
 
-    execute(
+    await execute(
       `INSERT INTO spmb_registrations (id, nomor_pendaftaran, nama_lengkap, nisn, tempat_lahir, tanggal_lahir, jenis_kelamin, agama, alamat, nama_ayah, pekerjaan_ayah, no_hp_ortu, nama_ibu, pekerjaan_ibu, nama_sekolah, alamat_sekolah, program_pilihan, status, created_at)
        VALUES (@id, @nomor_pendaftaran, @nama_lengkap, @nisn, @tempat_lahir, @tanggal_lahir, @jenis_kelamin, @agama, @alamat, @nama_ayah, @pekerjaan_ayah, @no_hp_ortu, @nama_ibu, @pekerjaan_ibu, @nama_sekolah, @alamat_sekolah, @program_pilihan, 'menunggu', @created_at)`,
       { id, nomor_pendaftaran, nama_lengkap, nisn, tempat_lahir, tanggal_lahir, jenis_kelamin, agama, alamat, nama_ayah, pekerjaan_ayah, no_hp_ortu, nama_ibu, pekerjaan_ibu, nama_sekolah, alamat_sekolah, program_pilihan, created_at }
@@ -35,7 +35,7 @@ export async function POST(request: Request) {
     if (!nomor_pendaftaran) {
       return NextResponse.json({ error: "Nomor pendaftaran wajib diisi" }, { status: 400 });
     }
-    const item = queryOne("SELECT nomor_pendaftaran, nama_lengkap, program_pilihan, status, created_at FROM spmb_registrations WHERE nomor_pendaftaran = @n", { n: nomor_pendaftaran });
+    const item = await queryOne("SELECT nomor_pendaftaran, nama_lengkap, program_pilihan, status, created_at FROM spmb_registrations WHERE nomor_pendaftaran = @n", { n: nomor_pendaftaran });
     if (!item) {
       return NextResponse.json({ error: "Nomor pendaftaran tidak ditemukan" }, { status: 404 });
     }
@@ -53,12 +53,12 @@ export async function PUT(request: Request) {
     return NextResponse.json({ error: "ID and status required" }, { status: 400 });
   }
 
-  execute("UPDATE spmb_registrations SET status = @status WHERE id = @id", { id, status });
+  await execute("UPDATE spmb_registrations SET status = @status WHERE id = @id", { id, status });
   return NextResponse.json({ ok: true });
 }
 
 export async function DELETE(request: Request) {
   const { id } = await request.json();
-  execute("DELETE FROM spmb_registrations WHERE id = @id", { id });
+  await execute("DELETE FROM spmb_registrations WHERE id = @id", { id });
   return NextResponse.json({ ok: true });
 }

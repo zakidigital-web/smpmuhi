@@ -1,12 +1,12 @@
 import type { MetadataRoute } from 'next'
 import { query } from "@/lib/database";
 
-export default function manifest(): MetadataRoute.Manifest {
+export default async function manifest(): Promise<MetadataRoute.Manifest> {
   let schoolName = "SMP Muhammadiyah 1 Genteng";
   let shortName = "SMP Muhammadiyah 1";
   let primaryColor = "#1B5E20";
   try {
-    const rows = query<{ key: string; value: string }>(
+    const rows = await query<{ key: string; value: string }>(
       "SELECT key, value FROM settings WHERE key IN ('schoolName', 'shortName', 'primaryColor')"
     );
     const map: Record<string, string> = {};
