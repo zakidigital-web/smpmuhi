@@ -1,8 +1,8 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { adminApi } from "@/lib/adminApi";
-import { Search, CheckCircle, XCircle, Clock, User, School, FileText } from "lucide-react";
+import { Search, CheckCircle, XCircle, Clock, User, School, FileText, Printer, X, GraduationCap, MapPin, Phone, Calendar, ChevronRight } from "lucide-react";
 
 export default function AdminSpmb() {
   const [items, setItems] = useState<any[]>([]);
@@ -25,6 +25,90 @@ export default function AdminSpmb() {
     if (!confirm("Hapus data pendaftaran ini?")) return;
     await adminApi.spmb.remove(id);
     setItems(items.filter((i) => i.id !== id));
+  };
+
+  const [detailItem, setDetailItem] = useState<any | null>(null);
+  const printRef = useRef<HTMLDivElement>(null);
+
+  const handlePrint = () => {
+    if (!printRef.current) return;
+    const printWindow = window.open("", "_blank");
+    if (!printWindow) return;
+    const html = `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <title>Cetak - ${detailItem?.nama_lengkap}</title>
+        <style>
+          @page { margin: 15mm; size: A4 portrait; }
+          body { font-family: 'Segoe UI', system-ui, sans-serif; color: #1e293b; margin: 0; padding: 0; }
+          .header { text-align: center; border-bottom: 2px solid #1B5E20; padding-bottom: 16px; margin-bottom: 24px; }
+          .header h1 { font-size: 20px; margin: 0 0 4px; color: #1B5E20; }
+          .header p { font-size: 13px; color: #64748b; margin: 0; }
+          .nomor { text-align: center; background: #f0fdf4; border: 1px solid #166534; border-radius: 8px; padding: 12px; margin-bottom: 24px; }
+          .nomor span { font-size: 14px; color: #166534; font-weight: 700; letter-spacing: 1px; }
+          .section { margin-bottom: 20px; }
+          .section h2 { font-size: 14px; font-weight: 700; color: #1B5E20; border-bottom: 1px solid #e2e8f0; padding-bottom: 6px; margin: 0 0 12px; }
+          .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px 24px; }
+          .field { }
+          .field .label { font-size: 11px; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px; }
+          .field .value { font-size: 14px; color: #1e293b; font-weight: 500; }
+          .full { grid-column: 1 / -1; }
+          .footer { text-align: center; font-size: 11px; color: #94a3b8; border-top: 1px solid #e2e8f0; padding-top: 12px; margin-top: 24px; }
+          @media print {
+            .no-print { display: none !important; }
+          }
+        </style>
+      </head>
+      <body>
+        <div class="header">
+          <h1>FORMULIR PENDAFTARAN SPMB</h1>
+          <p>SMP Muhammadiyah 1 Genteng - Tahun Ajaran 2026/2027</p>
+        </div>
+        <div class="nomor">
+          <span>Nomor Pendaftaran: ${detailItem?.nomor_pendaftaran}</span>
+        </div>
+        <div class="section">
+          <h2>A. Data Siswa</h2>
+          <div class="grid">
+            <div class="field"><div class="label">Nama Lengkap</div><div class="value">${detailItem?.nama_lengkap || "-"}</div></div>
+            <div class="field"><div class="label">NISN</div><div class="value">${detailItem?.nisn || "-"}</div></div>
+            <div class="field"><div class="label">Tempat Lahir</div><div class="value">${detailItem?.tempat_lahir || "-"}</div></div>
+            <div class="field"><div class="label">Tanggal Lahir</div><div class="value">${detailItem?.tanggal_lahir || "-"}</div></div>
+            <div class="field"><div class="label">Jenis Kelamin</div><div class="value">${detailItem?.jenis_kelamin === "L" ? "Laki-laki" : detailItem?.jenis_kelamin === "P" ? "Perempuan" : "-"}</div></div>
+            <div class="field"><div class="label">Agama</div><div class="value">${detailItem?.agama || "-"}</div></div>
+            <div class="field full"><div class="label">Alamat</div><div class="value">${detailItem?.alamat || "-"}</div></div>
+          </div>
+        </div>
+        <div class="section">
+          <h2>B. Data Orang Tua</h2>
+          <div class="grid">
+            <div class="field"><div class="label">Nama Ayah</div><div class="value">${detailItem?.nama_ayah || "-"}</div></div>
+            <div class="field"><div class="label">Pekerjaan Ayah</div><div class="value">${detailItem?.pekerjaan_ayah || "-"}</div></div>
+            <div class="field"><div class="label">Nama Ibu</div><div class="value">${detailItem?.nama_ibu || "-"}</div></div>
+            <div class="field"><div class="label">Pekerjaan Ibu</div><div class="value">${detailItem?.pekerjaan_ibu || "-"}</div></div>
+            <div class="field"><div class="label">No. HP Orang Tua</div><div class="value">${detailItem?.no_hp_ortu || "-"}</div></div>
+          </div>
+        </div>
+        <div class="section">
+          <h2>C. Data Sekolah & Program</h2>
+          <div class="grid">
+            <div class="field"><div class="label">SD/MI Asal</div><div class="value">${detailItem?.nama_sekolah || "-"}</div></div>
+            <div class="field full"><div class="label">Alamat SD/MI</div><div class="value">${detailItem?.alamat_sekolah || "-"}</div></div>
+            <div class="field"><div class="label">Program Pilihan</div><div class="value">${detailItem?.program_pilihan || "-"}</div></div>
+          </div>
+        </div>
+        <div class="footer">
+          Dicetak pada ${new Date().toLocaleDateString("id-ID", { day: "numeric", month: "long", year: "numeric", hour: "2-digit", minute: "2-digit" })}
+        </div>
+        <script>
+          window.onload = function() { window.print(); window.close(); };
+        </script>
+      </body>
+      </html>
+    `;
+    printWindow.document.write(html);
+    printWindow.document.close();
   };
 
   const filtered = items.filter((item: any) => {
@@ -135,6 +219,7 @@ export default function AdminSpmb() {
                             className="p-1.5 rounded-lg transition-colors" style={{ color: "var(--error)" }} title="Tolak"><XCircle className="w-4 h-4" /></button>
                         </>
                       )}
+                      <button onClick={() => { setDetailItem(item); }} className="p-1.5 rounded-lg transition-colors" style={{ color: "var(--primary)" }} title="Cetak PDF"><FileText className="w-4 h-4" /></button>
                       <button onClick={() => handleDelete(item.id)}
                         className="p-1.5 rounded-lg transition-colors" style={{ color: "var(--text-muted)" }} title="Hapus"><XCircle className="w-4 h-4" /></button>
                     </div>
@@ -148,6 +233,82 @@ export default function AdminSpmb() {
           Total: {filtered.length} pendaftar
         </div>
       </div>
+      {detailItem && (
+        <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4" onClick={() => setDetailItem(null)}>
+          <div className="rounded-2xl max-w-3xl w-full my-8 shadow-2xl overflow-y-auto max-h-[90vh]" style={{ background: "var(--card)" }} onClick={(e) => e.stopPropagation()}>
+            <div className="sticky top-0 flex items-center justify-between p-6 pb-4" style={{ background: "var(--card)", borderBottom: "1px solid var(--card-border)", zIndex: 1 }}>
+              <h2 className="text-lg font-bold" style={{ color: "var(--text-primary)" }}>Detail Pendaftar</h2>
+              <div className="flex items-center gap-2">
+                <button onClick={handlePrint} className="flex items-center gap-2 text-white px-4 py-2 rounded-lg text-sm font-semibold" style={{ background: "var(--primary)" }}>
+                  <Printer className="w-4 h-4" /> Cetak PDF
+                </button>
+                <button onClick={() => setDetailItem(null)} className="p-2 rounded-lg transition-colors" style={{ color: "var(--text-muted)" }}><X className="w-5 h-5" /></button>
+              </div>
+            </div>
+
+            <div ref={printRef} className="p-6">
+              <div className="text-center mb-6 pb-6" style={{ borderBottom: "2px solid var(--primary)" }}>
+                <h2 className="text-xl font-bold" style={{ color: "var(--primary)" }}>FORMULIR PENDAFTARAN SPMB</h2>
+                <p className="text-sm" style={{ color: "var(--text-muted)" }}>SMP Muhammadiyah 1 Genteng - Tahun Ajaran 2026/2027</p>
+              </div>
+
+              <div className="text-center p-4 rounded-xl mb-6" style={{ background: "var(--badge-bg)", border: "1px solid var(--badge-text)" }}>
+                <span className="font-bold text-sm" style={{ color: "var(--badge-text)", letterSpacing: "1px" }}>Nomor Pendaftaran: {detailItem.nomor_pendaftaran}</span>
+              </div>
+
+              <div className="space-y-6">
+                <div>
+                  <h3 className="text-sm font-bold mb-3" style={{ color: "var(--primary)", borderBottom: "1px solid var(--card-border)", paddingBottom: "6px" }}>A. Data Siswa</h3>
+                  <div className="grid grid-cols-2 gap-x-6 gap-y-3 text-sm">
+                    {[["Nama Lengkap", detailItem.nama_lengkap], ["NISN", detailItem.nisn], ["Tempat Lahir", detailItem.tempat_lahir], ["Tanggal Lahir", detailItem.tanggal_lahir], ["Jenis Kelamin", detailItem.jenis_kelamin === "L" ? "Laki-laki" : detailItem.jenis_kelamin === "P" ? "Perempuan" : "-"], ["Agama", detailItem.agama]].map(([label, value]) => (
+                      <div key={label as string}>
+                        <p className="text-[11px] uppercase tracking-wide" style={{ color: "var(--text-muted)" }}>{label as string}</p>
+                        <p className="font-medium" style={{ color: "var(--text-primary)" }}>{value as string}</p>
+                      </div>
+                    ))}
+                    <div className="col-span-2">
+                      <p className="text-[11px] uppercase tracking-wide" style={{ color: "var(--text-muted)" }}>Alamat</p>
+                      <p className="font-medium" style={{ color: "var(--text-primary)" }}>{detailItem.alamat}</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div>
+                  <h3 className="text-sm font-bold mb-3" style={{ color: "var(--primary)", borderBottom: "1px solid var(--card-border)", paddingBottom: "6px" }}>B. Data Orang Tua</h3>
+                  <div className="grid grid-cols-2 gap-x-6 gap-y-3 text-sm">
+                    {[["Nama Ayah", detailItem.nama_ayah], ["Pekerjaan Ayah", detailItem.pekerjaan_ayah], ["Nama Ibu", detailItem.nama_ibu], ["Pekerjaan Ibu", detailItem.pekerjaan_ibu], ["No. HP Orang Tua", detailItem.no_hp_ortu]].map(([label, value]) => (
+                      <div key={label as string}>
+                        <p className="text-[11px] uppercase tracking-wide" style={{ color: "var(--text-muted)" }}>{label as string}</p>
+                        <p className="font-medium" style={{ color: "var(--text-primary)" }}>{value as string}</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <div>
+                  <h3 className="text-sm font-bold mb-3" style={{ color: "var(--primary)", borderBottom: "1px solid var(--card-border)", paddingBottom: "6px" }}>C. Data Sekolah & Program</h3>
+                  <div className="grid grid-cols-2 gap-x-6 gap-y-3 text-sm">
+                    {[["SD/MI Asal", detailItem.nama_sekolah], ["Program Pilihan", detailItem.program_pilihan]].map(([label, value]) => (
+                      <div key={label as string}>
+                        <p className="text-[11px] uppercase tracking-wide" style={{ color: "var(--text-muted)" }}>{label as string}</p>
+                        <p className="font-medium" style={{ color: "var(--text-primary)" }}>{value as string}</p>
+                      </div>
+                    ))}
+                    <div className="col-span-2">
+                      <p className="text-[11px] uppercase tracking-wide" style={{ color: "var(--text-muted)" }}>Alamat SD/MI</p>
+                      <p className="font-medium" style={{ color: "var(--text-primary)" }}>{detailItem.alamat_sekolah}</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="text-center mt-6 pt-6 text-xs" style={{ color: "var(--text-muted)", borderTop: "1px solid var(--card-border)" }}>
+                Dicetak pada {new Date().toLocaleDateString("id-ID", { day: "numeric", month: "long", year: "numeric", hour: "2-digit", minute: "2-digit" })}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
