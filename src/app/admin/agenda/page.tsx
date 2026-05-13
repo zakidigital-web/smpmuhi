@@ -88,13 +88,13 @@ export default function AdminAgenda() {
               <div className="grid md:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium mb-1" style={{ color: "var(--text-secondary)" }}>Tanggal</label>
-                  <input value={form.date} onChange={(e) => setForm({ ...form, date: e.target.value })}
+                  <input type="date" value={form.date} onChange={(e) => setForm({ ...form, date: e.target.value })}
                     className="w-full px-3 py-2 border rounded-lg text-sm outline-none"
                     style={{ borderColor: "var(--card-border)", background: "var(--background)", color: "var(--text-primary)" }} />
                 </div>
                 <div>
                   <label className="block text-sm font-medium mb-1" style={{ color: "var(--text-secondary)" }}>Waktu</label>
-                  <input value={form.time} onChange={(e) => setForm({ ...form, time: e.target.value })}
+                  <input type="time" value={form.time} onChange={(e) => setForm({ ...form, time: e.target.value })}
                     className="w-full px-3 py-2 border rounded-lg text-sm outline-none"
                     style={{ borderColor: "var(--card-border)", background: "var(--background)", color: "var(--text-primary)" }} />
                 </div>

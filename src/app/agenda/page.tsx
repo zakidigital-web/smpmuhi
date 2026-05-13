@@ -21,6 +21,23 @@ type AgendaItem = {
   type: string;
 };
 
+const months = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
+
+function fmtDate(d: string): string {
+  if (/^\d{4}-\d{2}-\d{2}$/.test(d)) {
+    const [y, m, day] = d.split("-");
+    return `${parseInt(day)} ${months[parseInt(m) - 1]} ${y}`;
+  }
+  return d;
+}
+
+function fmtTime(t: string): string {
+  if (/^\d{2}:\d{2}$/.test(t)) {
+    return `${t.replace(":", ".")} WIB`;
+  }
+  return t;
+}
+
 export default function AgendaPage() {
   const [items, setItems] = useState<AgendaItem[]>([]);
   const [loading, setLoading] = useState(true);
@@ -107,8 +124,8 @@ export default function AgendaPage() {
                             </div>
                           </div>
                           <div className="flex flex-wrap items-center gap-x-4 gap-y-1 mt-2 text-xs" style={{ color: "var(--text-muted)" }}>
-                            <span className="flex items-center gap-1"><CalendarDays className="w-3.5 h-3.5" />{item.date}</span>
-                            <span className="flex items-center gap-1"><Clock className="w-3.5 h-3.5" />{item.time}</span>
+                            <span className="flex items-center gap-1"><CalendarDays className="w-3.5 h-3.5" />{fmtDate(item.date)}</span>
+                            <span className="flex items-center gap-1"><Clock className="w-3.5 h-3.5" />{fmtTime(item.time)}</span>
                             <span className="flex items-center gap-1"><MapPin className="w-3.5 h-3.5" />{item.location}</span>
                           </div>
                         </div>
@@ -145,11 +162,11 @@ export default function AgendaPage() {
               <div className="space-y-3 text-sm mb-6" style={{ color: "var(--text-secondary)" }}>
                 <div className="flex items-center gap-3">
                   <CalendarDays className="w-5 h-5" style={{ color: "var(--primary)" }} />
-                  <span>{selected.date}</span>
+                  <span>{fmtDate(selected.date)}</span>
                 </div>
                 <div className="flex items-center gap-3">
                   <Clock className="w-5 h-5" style={{ color: "var(--primary)" }} />
-                  <span>{selected.time}</span>
+                  <span>{fmtTime(selected.time)}</span>
                 </div>
                 <div className="flex items-center gap-3">
                   <MapPin className="w-5 h-5" style={{ color: "var(--primary)" }} />
