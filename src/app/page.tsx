@@ -1,8 +1,9 @@
 import Link from "next/link";
-import { Users, Award, GraduationCap, BookOpen, ArrowRight, Calendar, Clock, CheckCircle, Star, Newspaper, Camera } from "lucide-react";
+import { Users, Award, GraduationCap, BookOpen, ArrowRight, Calendar, Clock, CheckCircle, Newspaper, Camera } from "lucide-react";
 import HeroSlider from "@/components/HeroSlider";
 import UpcomingAgenda from "@/components/UpcomingAgenda";
 import FasilitasSection from "@/components/FasilitasSection";
+import SambutanKepalaSekolah from "@/components/SambutanKepalaSekolah";
 import { heroSlides } from "@/data/hero";
 import { beritaList } from "@/data/berita";
 import { galeriList } from "@/data/galeri";
@@ -15,48 +16,7 @@ export default function Home() {
     <>
       <HeroSlider slides={heroSlides} />
 
-      {/* Sambutan Kepala Sekolah */}
-      <section className="py-16 md:py-24 bg-section">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid md:grid-cols-2 gap-10 items-center">
-            {/* Foto / Placeholder - proportional */}
-            <div className="relative mx-auto w-full max-w-sm">
-              <div className="aspect-[4/5] rounded-2xl flex flex-col items-center justify-center" style={{ background: "color-mix(in srgb, var(--primary) 8%, var(--card))" }}>
-                <GraduationCap className="w-24 h-24" style={{ color: "color-mix(in srgb, var(--primary) 50%, transparent)" }} />
-                <span className="mt-3 text-sm font-medium" style={{ color: "color-mix(in srgb, var(--primary) 35%, transparent)" }}>Kepala Sekolah</span>
-              </div>
-              {/* Akreditasi badge */}
-              <div className="absolute -bottom-3 -right-3 px-4 py-3 rounded-xl shadow-lg flex items-center gap-2" style={{ background: "var(--secondary)", color: "var(--foreground)" }}>
-                <Award className="w-6 h-6" />
-                <div>
-                  <div className="text-xl font-bold leading-none">A</div>
-                  <div className="text-[11px] font-medium leading-tight">Akreditasi</div>
-                </div>
-              </div>
-            </div>
-
-            {/* Sambutan text */}
-            <div className="max-w-lg">
-              <h2 className="text-3xl md:text-4xl font-bold mb-6" style={{ color: "var(--text-primary)" }}>
-                Sambutan Kepala Sekolah
-              </h2>
-              <p className="mb-4" style={{ color: "var(--text-secondary)" }}>
-                Assalamu&apos;alaikum Wr. Wb.
-              </p>
-              <p className="mb-3 leading-relaxed" style={{ color: "var(--text-secondary)" }}>
-                Puji syukur ke hadirat Allah SWT yang telah memberikan rahmat dan karunia-Nya sehingga kita dapat bersilaturahmi melalui website ini.
-              </p>
-              <p className="mb-3 leading-relaxed" style={{ color: "var(--text-secondary)" }}>
-                SMP Muhammadiyah 1 Genteng berkomitmen untuk memberikan pendidikan terbaik yang berlandaskan nilai-nilai Islam, dengan program unggulan keagamaan, kurikulum Merdeka, dan tenaga pengajar yang kompeten.
-              </p>
-              <div className="border-l-4 pl-4 mt-6" style={{ borderColor: "var(--primary)" }}>
-                <p className="font-semibold" style={{ color: "var(--text-primary)" }}>Abdul Latif, S.Pd.</p>
-                <p className="text-sm" style={{ color: "var(--text-muted)" }}>Kepala SMP Muhammadiyah 1 Genteng</p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
+      <SambutanKepalaSekolah />
 
       {/* Program Unggulan - app-like cards */}
       <section className="py-16 md:py-24" style={{ background: "var(--section-alt)" }}>

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Menu, X, Home, School, BookOpen, Image, GraduationCap, Sun, Moon, Grid, User, Shield, Mail, Lock, CalendarDays } from "lucide-react";
@@ -36,8 +36,26 @@ const bottomMoreLinks = [
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const [showMore, setShowMore] = useState(false);
+  const [schoolName, setSchoolName] = useState("SMP Muhammadiyah 1");
+  const [schoolSub, setSchoolSub] = useState("Genteng");
   const pathname = usePathname();
   const { theme, toggle } = useTheme();
+
+  useEffect(() => {
+    fetch("/api/settings")
+      .then((r) => r.json())
+      .then((data) => {
+        if (data?.shortName) {
+          const parts = data.shortName.split(" ");
+          setSchoolName(parts.slice(0, -1).join(" ") || data.shortName);
+          setSchoolSub(parts[parts.length - 1] || "");
+        } else if (data?.schoolName) {
+          setSchoolName(data.schoolName);
+          setSchoolSub("");
+        }
+      })
+      .catch(() => {});
+  }, []);
 
   return (
     <>
@@ -50,8 +68,8 @@ export default function Navbar() {
                 <GraduationCap className="w-6 h-6 text-white" />
               </div>
               <span className="text-lg leading-tight">
-                <span className="font-bold text-xl block -mb-1" style={{ color: "var(--text-primary)" }}>SMP Muhammadiyah 1</span>
-                <span className="text-sm font-semibold" style={{ color: "var(--text-muted)" }}>Genteng</span>
+                <span className="font-bold text-xl block -mb-1" style={{ color: "var(--text-primary)" }}>{schoolName}</span>
+                {schoolSub && <span className="text-sm font-semibold" style={{ color: "var(--text-muted)" }}>{schoolSub}</span>}
               </span>
             </Link>
 
@@ -163,7 +181,7 @@ export default function Navbar() {
               <GraduationCap className="w-5 h-5 text-white" />
             </div>
             <span className="text-sm font-bold" style={{ color: "var(--text-primary)" }}>
-              SMP Muhammadiyah 1
+              {schoolName}
             </span>
           </Link>
 

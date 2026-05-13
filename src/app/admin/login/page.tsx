@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { GraduationCap, Lock, User, AlertCircle, Loader2 } from "lucide-react";
+import { GraduationCap, Lock, User, AlertCircle, Loader2, Database, Activity } from "lucide-react";
 import Link from "next/link";
 
 export default function AdminLogin() {
@@ -10,6 +10,7 @@ export default function AdminLogin() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [checking, setChecking] = useState(true);
+  const [dbStatus, setDbStatus] = useState<boolean | null>(null);
 
   useEffect(() => {
     if (localStorage.getItem("admin_logged_in") === "true") {
@@ -17,6 +18,9 @@ export default function AdminLogin() {
     } else {
       setChecking(false);
     }
+    fetch("/api/settings")
+      .then((r) => r.ok ? setDbStatus(true) : setDbStatus(false))
+      .catch(() => setDbStatus(false));
   }, []);
 
   if (checking) {
@@ -122,7 +126,27 @@ export default function AdminLogin() {
           </div>
         </div>
 
-        <div className="text-center mt-6">
+        <div className="mt-6">
+          <div className={`flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-sm ${
+            dbStatus === null ? "opacity-50" : ""
+          }`} style={{
+            background: dbStatus === true
+              ? "color-mix(in srgb, var(--success) 10%, transparent)"
+              : dbStatus === false
+                ? "color-mix(in srgb, var(--error) 10%, transparent)"
+                : "var(--card)",
+          }}>
+            {dbStatus === true ? (
+              <><Database className="w-4 h-4" style={{ color: "var(--success)" }} /><span className="font-medium" style={{ color: "var(--success)" }}>Database Terkoneksi</span></>
+            ) : dbStatus === false ? (
+              <><Activity className="w-4 h-4" style={{ color: "var(--error)" }} /><span className="font-medium" style={{ color: "var(--error)" }}>Database Tidak Terkoneksi</span></>
+            ) : (
+              <><Loader2 className="w-4 h-4 animate-spin" style={{ color: "var(--text-muted)" }} /><span style={{ color: "var(--text-muted)" }}>Memeriksa koneksi database...</span></>
+            )}
+          </div>
+        </div>
+
+        <div className="text-center mt-4">
           <Link href="/" className="text-sm transition-colors" style={{ color: "var(--text-muted)" }}>
             &larr; Kembali ke Beranda
           </Link>

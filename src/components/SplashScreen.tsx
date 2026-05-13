@@ -6,6 +6,24 @@ import { GraduationCap } from "lucide-react";
 export default function SplashScreen() {
   const [hide, setHide] = useState(false);
   const [remove, setRemove] = useState(false);
+  const [schoolName, setSchoolName] = useState("SMP Muhammadiyah 1");
+  const [schoolSub, setSchoolSub] = useState("Genteng &mdash; Banyuwangi");
+
+  useEffect(() => {
+    fetch("/api/settings")
+      .then((r) => r.json())
+      .then((data) => {
+        if (data?.shortName) {
+          const parts = data.shortName.split(" ");
+          setSchoolName(parts.slice(0, -1).join(" ") || data.shortName);
+          setSchoolSub(parts[parts.length - 1] || "");
+        } else if (data?.schoolName) {
+          setSchoolName(data.schoolName);
+          setSchoolSub("");
+        }
+      })
+      .catch(() => {});
+  }, []);
 
   useEffect(() => {
     const ready = () => {
@@ -28,8 +46,8 @@ export default function SplashScreen() {
       <div className="splash-icon">
         <GraduationCap className="w-10 h-10" style={{ color: "var(--primary)" }} />
       </div>
-      <div className="splash-title">SMP Muhammadiyah 1</div>
-      <div className="splash-sub">Genteng &mdash; Banyuwangi</div>
+      <div className="splash-title">{schoolName}</div>
+      {schoolSub && <div className="splash-sub" dangerouslySetInnerHTML={{ __html: schoolSub }} />}
       <div className="splash-loader">
         <div className="splash-loader-bar" />
       </div>

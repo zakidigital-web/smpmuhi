@@ -23,6 +23,7 @@ export type SiteSettings = {
   feeActivities: string;
   showFacilities: string;
   facilities: string;
+  kepalaSekolah: string;
   adminPassword: string;
 };
 
@@ -51,5 +52,6 @@ export const siteSettings: SiteSettings = {
   feeActivities: "Rp 50.000",
   showFacilities: "1",
   facilities: "Ruang Kelas Nyaman, Lab Komputer, Perpustakaan, Musholla, Lapangan Olahraga, Kantin Sehat, Ruang UKS, WiFi Internet, Pondok Pesantren",
+  kepalaSekolah: "Abdul Latif, S.Pd.",
   adminPassword: "240be518fabd2724ddb6f04eeb1da5967448d7e831c08c8fa822809f74c720a9",
 };
