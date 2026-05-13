@@ -18,6 +18,8 @@ const defaultSettings: Record<string, string> = {
   secondaryColor: "#F59E0B",
   accentColor: "#1565C0",
   sppmYear: "2026",
+  footerDescription: "Sekolah menengah pertama unggulan di bawah naungan Muhammadiyah, berkomitmen mencetak generasi berakhlak mulia, berilmu, dan berkemajuan.",
+  copyright: "All rights reserved.",
 };
 
 export default function AdminSettings() {
@@ -140,6 +142,22 @@ export default function AdminSettings() {
             <div>
               <label className="block text-sm font-medium" style={labelStyle}>YouTube</label>
               <input value={form.youtube} onChange={(e) => update("youtube", e.target.value)}
+                className={inputClass} style={{ borderColor: "var(--card-border)", background: "var(--background)", color: "var(--text-primary)" }} />
+            </div>
+          </div>
+        </div>
+
+        <div style={sectionStyle}>
+          <h2 className="text-lg font-semibold mb-4" style={{ color: "var(--text-primary)" }}>Footer</h2>
+          <div className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium" style={labelStyle}>Deskripsi Footer</label>
+              <textarea value={form.footerDescription} onChange={(e) => update("footerDescription", e.target.value)}
+                className={inputClass} style={{ borderColor: "var(--card-border)", background: "var(--background)", color: "var(--text-primary)" }} rows={3} />
+            </div>
+            <div>
+              <label className="block text-sm font-medium" style={labelStyle}>Teks Hak Cipta</label>
+              <input value={form.copyright} onChange={(e) => update("copyright", e.target.value)}
                 className={inputClass} style={{ borderColor: "var(--card-border)", background: "var(--background)", color: "var(--text-primary)" }} />
             </div>
           </div>
