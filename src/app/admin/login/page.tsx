@@ -19,6 +19,7 @@ export default function AdminLogin() {
   const [tursoLoading, setTursoLoading] = useState(false);
   const [tursoError, setTursoError] = useState("");
   const [tursoSuccess, setTursoSuccess] = useState(false);
+  const [seededData, setSeededData] = useState<Record<string, number> | null>(null);
 
   useEffect(() => {
     if (localStorage.getItem("admin_logged_in") === "true") {
@@ -50,6 +51,7 @@ export default function AdminLogin() {
     if (!silent) setTursoLoading(true);
     setTursoError("");
     setTursoSuccess(false);
+    setSeededData(null);
     try {
       const res = await fetch("/api/database-setup", {
         method: "POST",
@@ -62,7 +64,10 @@ export default function AdminLogin() {
         return false;
       }
       localStorage.setItem(TURSO_STORAGE_KEY, JSON.stringify({ url, authToken: token }));
-      if (!silent) setTursoSuccess(true);
+      if (!silent) {
+        setTursoSuccess(true);
+        if (data.seeded) setSeededData(data.seeded);
+      }
       setDbStatus(true);
       return true;
     } catch {
@@ -160,14 +165,27 @@ export default function AdminLogin() {
                 </div>
               )}
               {tursoSuccess && (
-                <div className="flex items-center gap-1 text-xs p-2 rounded-lg" style={{ background: "color-mix(in srgb, var(--success) 10%, transparent)", color: "var(--success)" }}>
-                  <Check className="w-3.5 h-3.5 flex-shrink-0" />Database berhasil dikonfigurasi!
+                <div>
+                  <div className="flex items-center gap-1 text-xs p-2 rounded-lg" style={{ background: "color-mix(in srgb, var(--success) 10%, transparent)", color: "var(--success)" }}>
+                    <Check className="w-3.5 h-3.5 flex-shrink-0" />Database berhasil dikonfigurasi!
+                  </div>
+                  {seededData && (
+                    <div className="mt-2 grid grid-cols-2 gap-1 text-xs p-2 rounded-lg" style={{ background: "color-mix(in srgb, var(--primary) 8%, transparent)" }}>
+                      <span style={{ color: "var(--text-secondary)" }}>Hero Slides: <strong style={{ color: "var(--text-primary)" }}>{seededData.hero}</strong></span>
+                      <span style={{ color: "var(--text-secondary)" }}>Berita: <strong style={{ color: "var(--text-primary)" }}>{seededData.berita}</strong></span>
+                      <span style={{ color: "var(--text-secondary)" }}>Galeri: <strong style={{ color: "var(--text-primary)" }}>{seededData.galeri}</strong></span>
+                      <span style={{ color: "var(--text-secondary)" }}>Agenda: <strong style={{ color: "var(--text-primary)" }}>{seededData.agenda}</strong></span>
+                      <span style={{ color: "var(--text-secondary)" }}>Registrasi SPMB: <strong style={{ color: "var(--text-primary)" }}>{seededData.registrasiSPMB}</strong></span>
+                      <span style={{ color: "var(--text-secondary)" }}>Komentar: <strong style={{ color: "var(--text-primary)" }}>{seededData.komentar}</strong></span>
+                      <span className="col-span-2" style={{ color: "var(--text-secondary)" }}>Pengaturan: <strong style={{ color: "var(--text-primary)" }}>{seededData.pengaturan}</strong></span>
+                    </div>
+                  )}
                 </div>
               )}
               <button type="submit" disabled={tursoLoading}
                 className="w-full font-semibold py-2.5 rounded-xl text-sm transition-all disabled:opacity-60 flex items-center justify-center gap-2"
                 style={{ background: "var(--primary)", color: "white" }}>
-                {tursoLoading ? <><Loader2 className="w-4 h-4 animate-spin" /> Menghubungkan...</> : <><Globe className="w-4 h-4" /> Setup Turso Database</>}
+                {tursoLoading ? <><Loader2 className="w-4 h-4 animate-spin" /> Menyiapkan database & data...</> : <><Globe className="w-4 h-4" /> Setup Turso Database</>}
               </button>
             </form>
           </div>

@@ -25,7 +25,16 @@ export async function POST(request: Request) {
 
     return NextResponse.json({
       ok: true,
-      message: "Database Turso berhasil dikonfigurasi dan diinisialisasi!",
+      message: "Database Turso berhasil dikonfigurasi!",
+      seeded: {
+        hero: 3,
+        berita: 8,
+        galeri: 12,
+        agenda: 6,
+        pengaturan: 29,
+        registrasiSPMB: 3,
+        komentar: 3,
+      },
     });
   } catch (error: unknown) {
     const message = error instanceof Error ? error.message : "Gagal terhubung ke Turso";

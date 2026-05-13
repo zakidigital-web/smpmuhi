@@ -251,7 +251,35 @@ async function seedData() {
   for (const [key, value] of Object.entries(siteSettings)) {
     await db.execute("INSERT INTO settings (key, value) VALUES (@key, @value)", { key, value: String(value) });
   }
+
+  const dummyRegistrations = [
+    { nama_lengkap: "Ahmad Fauzi", nisn: "1234567890", tempat_lahir: "Banyuwangi", tanggal_lahir: "2011-08-15", jenis_kelamin: "L", agama: "Islam", alamat: "Jl. Merdeka No.10, Genteng", nama_ayah: "Suparman", pekerjaan_ayah: "Petani", no_hp_ortu: "081234567890", nama_ibu: "Siti Aminah", pekerjaan_ibu: "Ibu Rumah Tangga", nama_sekolah: "SD Negeri 1 Genteng", alamat_sekolah: "Jl. Raya Genteng No.1", program_pilihan: "Reguler", status: "diterima", nomor_pendaftaran: "SPMB-240101001", created_at: "2026-01-15T08:30:00.000Z" },
+    { nama_lengkap: "Nurul Hidayah", nisn: "2234567891", tempat_lahir: "Banyuwangi", tanggal_lahir: "2011-12-20", jenis_kelamin: "P", agama: "Islam", alamat: "Ds. Krajan, Kec. Genteng", nama_ayah: "Hasanudin", pekerjaan_ayah: "Guru", no_hp_ortu: "082345678901", nama_ibu: "Fatimah", pekerjaan_ibu: "Guru", nama_sekolah: "SD Muhammadiyah 1 Genteng", alamat_sekolah: "Jl. Pesantren No.5", program_pilihan: "Reguler", status: "menunggu", nomor_pendaftaran: "SPMB-240201002", created_at: "2026-02-20T10:15:00.000Z" },
+    { nama_lengkap: "Dimas Prasetyo", nisn: "3234567892", tempat_lahir: "Jember", tanggal_lahir: "2012-03-10", jenis_kelamin: "L", agama: "Islam", alamat: "Perum Griya Asri Blok A5, Genteng", nama_ayah: "Agus Prasetyo", pekerjaan_ayah: "Wiraswasta", no_hp_ortu: "083456789012", nama_ibu: "Dewi Sartika", pekerjaan_ibu: "Perawat", nama_sekolah: "SD Negeri 2 Genteng", alamat_sekolah: "Jl. Pendidikan No.10", program_pilihan: "Prestasi", status: "diterima", nomor_pendaftaran: "SPMB-240301003", created_at: "2026-03-05T14:00:00.000Z" },
+  ];
+  for (const r of dummyRegistrations) {
+    const id = "DUM-" + r.nomor_pendaftaran;
+    await db.execute(
+      `INSERT INTO spmb_registrations (id, nomor_pendaftaran, nama_lengkap, nisn, tempat_lahir, tanggal_lahir, jenis_kelamin, agama, alamat, nama_ayah, pekerjaan_ayah, no_hp_ortu, nama_ibu, pekerjaan_ibu, nama_sekolah, alamat_sekolah, program_pilihan, status, created_at)
+       VALUES (@id, @nomor_pendaftaran, @nama_lengkap, @nisn, @tempat_lahir, @tanggal_lahir, @jenis_kelamin, @agama, @alamat, @nama_ayah, @pekerjaan_ayah, @no_hp_ortu, @nama_ibu, @pekerjaan_ibu, @nama_sekolah, @alamat_sekolah, @program_pilihan, @status, @created_at)`,
+      { ...r, id } as any
+    );
+  }
+
+  const dummyComments = [
+    { name: "Ani", content: "Informasi pendaftarannya sangat jelas. Terima kasih.", created_at: "2026-01-16T09:00:00.000Z" },
+    { name: "Budi Santoso", content: "Apakah ada jalur beasiswa untuk siswa kurang mampu?", created_at: "2026-01-18T14:30:00.000Z" },
+    { name: "Citra Dewi", content: "Anak saya sudah daftar, semoga diterima! Aamiin.", created_at: "2026-02-01T07:15:00.000Z" },
+  ];
+  for (const c of dummyComments) {
+    await db.execute(
+      "INSERT INTO comments (id, berita_id, name, content, created_at) VALUES (@id, @berita_id, @name, @content, @created_at)",
+      { id: "c" + Date.now() + Math.random().toString(36).slice(2, 6), berita_id: "1", ...c }
+    );
+  }
 }
+
+
 
 export async function query<T = unknown>(sql: string, params?: Record<string, unknown> | any[]): Promise<T[]> {
   const db = await getDb();
