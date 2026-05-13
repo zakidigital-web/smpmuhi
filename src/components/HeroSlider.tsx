@@ -20,12 +20,13 @@ export default function HeroSlider({ slides }: { slides: HeroSlide[] }) {
 
   const slide = slides[current];
 
-  const bgImage = slide.image ? `url(${slide.image})` : null;
-
   return (
     <section
-      className={`relative ${slide.image ? "" : `bg-gradient-to-br ${slide.gradient}`} text-white overflow-hidden`}
-      style={slide.image ? { background: `linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url(${slide.image}) center/cover` } : undefined}
+      className="relative text-white overflow-hidden"
+      style={slide.image
+        ? { background: `linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url(${slide.image}) center/cover` }
+        : { background: slide.gradient }
+      }
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
     >

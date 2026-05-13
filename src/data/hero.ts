@@ -23,7 +23,7 @@ export const heroSlides: HeroSlide[] = [
     ctaHref: "/spmb/daftar",
     ctaSecondaryText: "Lihat Program Unggulan",
     ctaSecondaryHref: "/program",
-    gradient: "from-green-900 via-green-800 to-blue-900",
+    gradient: "linear-gradient(135deg, #1B5E20, #1565C0)",
     active: true,
   },
   {
@@ -36,7 +36,7 @@ export const heroSlides: HeroSlide[] = [
     ctaHref: "/spmb",
     ctaSecondaryText: "Daftar Online",
     ctaSecondaryHref: "/spmb/daftar",
-    gradient: "from-blue-900 via-blue-800 to-green-900",
+    gradient: "linear-gradient(135deg, #1565C0, #1B5E20)",
     active: true,
   },
   {
@@ -49,7 +49,7 @@ export const heroSlides: HeroSlide[] = [
     ctaHref: "/profil",
     ctaSecondaryText: "Profil Sekolah",
     ctaSecondaryHref: "/profil",
-    gradient: "from-green-800 via-emerald-700 to-teal-900",
+    gradient: "linear-gradient(135deg, #065F46, #0D9488)",
     active: true,
   },
 ];

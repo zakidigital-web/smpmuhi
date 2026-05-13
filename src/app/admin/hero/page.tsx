@@ -10,15 +10,17 @@ function normalize(s: Record<string, unknown>) {
 
 const emptySlide = {
   id: "", headline: "", tagline: "", description: "",
-  ctaText: "", ctaHref: "", gradient: "from-green-900 via-green-800 to-blue-900", active: true,
+  ctaText: "", ctaHref: "", gradient: "linear-gradient(135deg, #1B5E20, #1565C0)", active: true,
 };
 
 const gradients = [
-  "from-green-900 via-green-800 to-blue-900",
-  "from-blue-900 via-blue-800 to-green-900",
-  "from-green-800 via-emerald-700 to-teal-900",
-  "from-slate-900 via-green-900 to-blue-900",
-  "from-emerald-900 via-teal-800 to-cyan-900",
+  { value: "linear-gradient(135deg, #1B5E20, #1565C0)", label: "Hijau ke Biru" },
+  { value: "linear-gradient(135deg, #1565C0, #1B5E20)", label: "Biru ke Hijau" },
+  { value: "linear-gradient(135deg, #065F46, #0D9488)", label: "Emerald ke Teal" },
+  { value: "linear-gradient(135deg, #0F172A, #1B5E20)", label: "Slate ke Hijau" },
+  { value: "linear-gradient(135deg, #064E3B, #164E63)", label: "Emerald ke Cyan" },
+  { value: "linear-gradient(135deg, #4ADE80, #FBBF24)", label: "Terang (Hijau-Kuning)" },
+  { value: "linear-gradient(135deg, #F59E0B, #DC2626)", label: "Orange ke Merah" },
 ];
 
 export default function AdminHero() {
@@ -117,18 +119,18 @@ export default function AdminHero() {
                 <textarea value={form.headline} onChange={(e) => setForm({ ...form, headline: e.target.value })}
                   className="w-full px-3 py-2 border rounded-lg text-sm outline-none" style={{ borderColor: "var(--card-border)", background: "var(--background)", color: "var(--text-primary)" }} rows={2} placeholder="Gunakan \n untuk baris baru" />
               </div>
-              <div className="grid md:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium mb-1" style={{ color: "var(--text-secondary)" }}>Headline</label>
-                  <textarea value={form.headline} onChange={(e) => setForm({ ...form, headline: e.target.value })}
-                    className="w-full px-3 py-2 border rounded-lg text-sm outline-none" style={{ borderColor: "var(--card-border)", background: "var(--background)", color: "var(--text-primary)" }} rows={2} placeholder="Gunakan \n untuk baris baru" />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium mb-1" style={{ color: "var(--text-secondary)" }}>Gradient</label>
-                  <select value={form.gradient} onChange={(e) => setForm({ ...form, gradient: e.target.value })}
-                    className="w-full px-3 py-2 border rounded-lg text-sm outline-none" style={{ borderColor: "var(--card-border)", background: "var(--background)", color: "var(--text-primary)" }}>
-                    {gradients.map((g) => <option key={g} value={g}>{g}</option>)}
-                  </select>
+              <div>
+                <label className="block text-sm font-medium mb-2" style={{ color: "var(--text-secondary)" }}>Gradient Latar</label>
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                  {gradients.map((g) => (
+                    <button key={g.value} type="button" onClick={() => setForm({ ...form, gradient: g.value })}
+                      className="relative rounded-xl overflow-hidden h-16 transition-all tap-scale"
+                      style={{ background: g.value, outline: form.gradient === g.value ? "2px solid var(--primary)" : "2px solid transparent", outlineOffset: "1px" }}>
+                      <span className="absolute inset-0 flex items-end p-2">
+                        <span className="text-[10px] font-medium text-white/90 drop-shadow-md bg-black/30 px-1.5 py-0.5 rounded">{g.label}</span>
+                      </span>
+                    </button>
+                  ))}
                 </div>
               </div>
               <div>
@@ -215,7 +217,7 @@ export default function AdminHero() {
           <div key={slide.id} className="rounded-xl overflow-hidden" style={{ background: "var(--card)", border: "1px solid var(--card-border)" }}>
             <div className="p-6">
               <div className="flex items-start gap-4">
-                <div className={`w-20 h-20 rounded-xl flex items-center justify-center flex-shrink-0 bg-gradient-to-br ${slide.gradient}`}>
+                <div className="w-20 h-20 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: slide.gradient }}>
                   <Star className="w-8 h-8 text-white/60" />
                 </div>
                 <div className="flex-1 min-w-0">
