@@ -43,6 +43,9 @@ export default function RootLayout({
   return (
     <html lang="id" className={`${poppins.variable} ${inter.variable}`}>
       <head>
+        <script dangerouslySetInnerHTML={{
+          __html: `(function(){try{var c=JSON.parse(localStorage.getItem("theme_colors"));if(c){var r=document.documentElement;if(c.primaryColor)r.style.setProperty("--primary",c.primaryColor);if(c.secondaryColor)r.style.setProperty("--secondary",c.secondaryColor);if(c.accentColor)r.style.setProperty("--accent",c.accentColor);}}catch(e){}})();`
+        }} />
         <meta name="theme-color" content="#1B5E20" media="(prefers-color-scheme: light)" />
         <meta name="theme-color" content="#0F172A" media="(prefers-color-scheme: dark)" />
         <meta name="application-name" content="SMP Mutiara" />
